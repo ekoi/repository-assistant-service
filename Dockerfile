@@ -1,6 +1,6 @@
 FROM python:3.11.3-slim-bullseye
 
-ARG VERSION=0.1.1
+ARG VERSION=0.1.2
 
 RUN useradd -ms /bin/bash dans
 

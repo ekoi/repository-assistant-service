@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "repository-assistant-service"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["Eko Indarto <eko.indarto@dans.knaw.nl>"]
 readme = "README.md"
