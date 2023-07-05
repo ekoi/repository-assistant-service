@@ -1,0 +1,15 @@
+[default]
+service_name = "repository-assistant-service"
+#FastAPI
+fastapi_title = "Repository Selection and Advice Service"
+fastapi_description = "Recommend repository or repositories based on deposit attributes<br/>Recommend metadata schema and profile based on repository, format and domain"
+
+
+repositories_conf_dir = "@format {env[BASE_DIR]}/resources/saved-repos-conf"
+
+log_file = "@format {env[BASE_DIR]}/logs/rsas.log"
+#log_file = "../logs/dsg.log"
+log_level = 10
+log_format = "%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s"
+
+dans_formats_url = "https://raw.githubusercontent.com/ekoi/DANS-File-Formats/draft/dans-file-formats.json"

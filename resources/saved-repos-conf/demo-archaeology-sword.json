@@ -1,0 +1,11 @@
+{
+  "name":"demo.sword2.archaeology.datastations.nl",
+  "url" : "https://dar.dans.knaw.nl",
+  "deposit-protocol": "SWORD2",
+  "deposit-url": "https://demo.sword2.archaeology.datastations.nl/collection/1",
+  "metadata-config": "https://",
+  "metadata-specification":["https://raw.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
+  "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"],
+  "transformer-name": "form-metadata-to-dataset.xsl",
+  "file-conversion-url": "https://"
+}

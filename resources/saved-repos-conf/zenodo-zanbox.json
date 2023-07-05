@@ -1,0 +1,10 @@
+{
+  "name":"sandbox Zenodo",
+  "url" : "https://sandbox.zenodo.org/",
+  "ingest-protocol": "API",
+  "ingest-url": "https://sandbox.zenodo.org/api",
+  "metadata-config": "https://",
+  "metadata-specification":["http://www.dcc.ac.uk/resources/metadata-standards/datacite-metadata-schema","http://www.dcc.ac.uk/resources/metadata-standards/dublin-core"],
+  "transformer-url": "http://localhost:1745/transform/form-metadata-to-dataset.xsl",
+  "file-conversion-url": "https://"
+}
