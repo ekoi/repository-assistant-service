@@ -1,0 +1,77 @@
+{
+    "assistant-config-name": "new-local.ssh.datastations.nl",
+    "description": "",
+    "app-name": "ohsmart",
+    "app-config-url": "https://",
+    "targets": [
+        {
+            "repo-name": "demo.ssh.datastations.nl",
+            "repo-display-name": "SSH Datastation",
+            "bridge-module-class": "DansSwordDepositor",
+            "base-url": "https://demo.ssh.datastations.nl",
+            "target-url": "https://demo.sword2.ssh.datastations.nl/collection/1",
+            "username": "API_KEY",
+            "password": "",
+            "metadata": {
+                "specification": [
+                    "https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
+                    "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"
+                ],
+                "transformed-metadata": [
+                    {
+                        "name": "dataset.xml",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-dataset-xml-v5.xsl",
+                        "target-dir": "metadata"
+                    },
+                    {
+                        "name": "files.xml",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-files-xml-v1.xsl",
+                        "target-dir": "metadata"
+                    },
+                    {
+                        "name": "__generated__form-metadata-original.json",
+                        "mimetype": "application/json",
+                        "restricted": true
+                    },
+                    {
+                        "name": "__generated__form-metadata-clean-all.json",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-all-v1.xsl",
+                        "restricted": true
+                    },
+                    {
+                        "name": "__generated__form-metadata-private.json",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-private-v1.xsl",
+                        "restricted": true
+                    },
+                    {
+                        "name": "__generated__form-metadata-private.txt",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-private-v1.xsl",
+                        "restricted": true
+                    },
+                    {
+                        "name": "__generated__form-metadata-public.json",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-public-v1.xsl",
+                        "restricted": false
+                    },
+                    {
+                        "name": "__generated__form-metadata-public.txt",
+                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-public-v1.xsl",
+                        "restricted": false
+                    }
+                ]
+            }
+        }
+    ],
+    "file-conversions": [
+        {
+            "origin-type": "mov",
+            "target-type": "mp4",
+            "conversion-url": "https://"
+        },
+        {
+            "origin-type": "mp4",
+            "target-type": "mp3",
+            "conversion-url": "https://"
+        }
+    ]
+}
