@@ -7,7 +7,7 @@ from pydantic_core import ValidationError
 from starlette.responses import FileResponse
 
 from src.commons import settings, data
-from src.models.assistant_datamodel import RepoAssistantModel
+from src.models.assistant_datamodel import RepoAssistantDataModel
 
 router = APIRouter()
 
@@ -39,7 +39,7 @@ async def upload_repository(submitted_repo_conf: Request, overwrite: Union[bool,
 
     repo_conf_json = await submitted_repo_conf.json()
     try:
-        repo_assistant = RepoAssistantModel.model_validate(repo_conf_json)
+        repo_assistant = RepoAssistantDataModel.model_validate(repo_conf_json)
         if not overwrite and repo_assistant.assistant_config_name in data.keys():
             raise HTTPException(status_code=400, detail=f'Repository Configuration "'
                                                         f'{repo_assistant.assistant_config_name}" exist.'

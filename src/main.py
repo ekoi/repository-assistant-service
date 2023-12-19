@@ -16,7 +16,7 @@ from src.commons import data, settings
 
 __version__ = importlib.metadata.metadata(settings.SERVICE_NAME)["version"]
 
-from src.models.assistant_datamodel import RepoAssistantModel
+from src.models.assistant_datamodel import RepoAssistantDataModel
 
 api_keys = [
     settings.DANS_REPO_ASSISTANT_SERVICE_API_KEY
@@ -77,7 +77,7 @@ def installed_repos_configs():
         if repo_conf_filename.endswith('.json'):
             with open(os.path.join(settings.repositories_conf_dir, repo_conf_filename)) as f:
                 saved_repo_assistant = json.loads(f.read())
-                repo_assistant = RepoAssistantModel.model_validate(saved_repo_assistant)
+                repo_assistant = RepoAssistantDataModel.model_validate(saved_repo_assistant)
                 data.update({repo_assistant.assistant_config_name: repo_assistant})
 
 

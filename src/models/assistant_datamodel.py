@@ -72,7 +72,7 @@ class FileConversion(BaseModel):
     conversion_url: str = Field(..., alias='conversion-url')
 
 
-class RepoAssistantModel(BaseModel):
+class RepoAssistantDataModel(BaseModel):
     """
     Represents the configuration model for the repository assistant application.
 
