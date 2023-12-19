@@ -1,16 +1,102 @@
-# repository-assistant-service
+# Repository Assistant Service
 
-curl -X 'POST' -H "Authorization: Bearer APIKEY" -H 'Content-Type: application/json' 'https://repository-assistant.labs.dans.knaw.nl/upload-repo?overwrite=true' -d @/Users/akmi/git/ekoi/poc-4-wim/repository-assistant-service/resources/saved-repos-conf/ds-ssh-demo.json 
-curl -X 'POST' -H "Authorization: Bearer APIKEY" -H 
-'Content-Type: application/json' 'http://localhost:2810/upload-repo?overwrite=true' -d @/Users/akmi/git/ekoi/poc-4-wim/repository-assistant-service/resources/saved-repos-conf/ohsmart-local-new.json
+## Overview
 
-docker build --platform linux/amd64
+This documentation provides an overview and explanation of the Python code implementing a FastAPI service. The service includes endpoints for both public and protected routes, with the latter requiring API key authentication. The service initializes by loading repository configurations from JSON files during startup.
+
+### Table of Contents
+1. [Prerequisites](#prerequisites)
+2. [Dependencies](#dependencies)
+3. [Configuration](#configuration)
+4. [Authentication](#authentication)
+5. [Endpoints](#endpoints)
+6. [Middleware](#middleware)
+7. [Startup Process](#startup-process)
+
+---
+
+## 1. Prerequisites <a name="prerequisites"></a>
+
+- **Python**: Ensure that Python is installed on the system. The code is designed to work with Python 3.12 and above.
+
+## 2. Dependencies <a name="dependencies"></a>
+
+The following external libraries are required for the service:
+
+- **FastAPI**: A modern, fast web framework for building APIs with Python.
+- **Uvicorn**: An ASGI server for running FastAPI applications.
+- **Starlette**: The underlying ASGI framework for FastAPI.
+- **Emoji**: A library for adding emoji support to Python applications.
+- **Importlib-metadata**: A library for accessing the metadata for installed Python packages.
+
+These dependencies can be installed using the following command:
+### 2. Dependencies <a name="dependencies"></a>
+
+The main dependencies include:
+
+- **FastAPI**: A modern, fast web framework for building APIs.
+- **Uvicorn**: An ASGI server for running FastAPI applications.
+- **Starlette**: The ASGI framework supporting FastAPI.
+- **Emoji**: A library for adding emoji support.
+- **Importlib-metadata**: A library for accessing package metadata.
+
+### 3. Configuration <a name="configuration"></a>
+
+Configuration settings are stored in the settings module. Ensure the following settings are appropriately configured:
+
+- `FASTAPI_TITLE`: Title for the FastAPI service.
+- `FASTAPI_DESCRIPTION`: Description for the FastAPI service.
+- `SERVICE_NAME`: Name of the service.
+- `DANS_REPO_ASSISTANT_SERVICE_API_KEY`: API key for authentication.
+- `repositories_conf_dir`: Directory containing repository configuration files.
+
+### 4. Authentication <a name="authentication"></a>
+
+API key authentication is implemented using OAuth2 token authentication. The API key is specified in the api_keys list. To access protected routes, clients must include the API key in the request.
+
+### 5. Endpoints <a name="endpoints"></a>
+
+#### Public Endpoints
+
+- **Routes**: Defined in the public.router module.
+- **Tags**: "Public"
+- **Prefix**: None
+
+#### Protected Endpoints
+
+- **Routes**: Defined in the protected.router module.
+- **Tags**: "Protected"
+- **Prefix**: None
+- **Dependencies**: api_key_auth function enforces API key authentication.
+
+### 6. Middleware <a name="middleware"></a>
+
+The service includes CORS middleware (CORSMiddleware) to handle Cross-Origin Resource Sharing. It allows requests from any origin (allow_origins=["*"]) and supports various HTTP methods and headers.
+
+### 7. Startup Process <a name="startup-process"></a>
+
+The startup process involves the following steps:
+
+1. **Initializing Repositories**: The service reads JSON files from the specified repositories_conf_dir during startup. Repository configurations are loaded using the installed_repos_configs function.
+2. **Displaying Available Configurations**: The available repository configurations are printed to the console.
+3. **Updating Service Information**: The service version is added to the data dictionary.
+4. **Print Emoji Confirmation**: A thumbs-up emoji is printed to the console.
+
+### 8. How to Run <a name="how-to-run"></a>
+
+The service will be accessible at http://0.0.0.0:2810 and the API Docs will be accessible at http://0.0.0.0:2810/docs 
+or  http://0.0.0.0:2810/redoc
+
+To start the service, run the following command:
+```bash
+uvicorn src.main:app --host 0.0.0.0 --port 2810 --reload False
+
+```bash
+pip install fastapi uvicorn starlette emoji importlib-metadata
 
 
-rm -rf dist; poetry install; poetry update; poetry build; docker rm -f repository-assistant-service; docker rmi ekoindarto/repository-assistant-service:0.1.6-arm64;  docker build --no-cache -t ekoindarto/repository-assistant-service:0.1.6-arm64 -f Dockerfile . ;docker run -v ./conf:/home/dans/repository-assistant-service/conf -d -p 2810:2810 --name repository-assistant-service ekoindarto/repository-assistant-service:0.1.6-arm64; docker exec -it repository-assistant-service /bin/bash
-rm -rf dist; poetry install; poetry update; poetry build; docker rm -f repository-assistant-service; docker rmi ekoindarto/repository-assistant-service:0.1.6;  docker build --platform linux/amd64 --no-cache -t ekoindarto/repository-assistant-service:0.1.6 -f Dockerfile . ;docker run -v ./conf:/home/dans/repository-assistant-service/conf -d -p 2810:2810 --name repository-assistant-service ekoindarto/repository-assistant-service:0.1.6; docker exec -it repository-assistant-service /bin/bash
 
-docker run -v ./conf:/home/dans/repository-assistant-servi ce/conf -d -p 2810:2810 --name repository-assistant-service ekoindarto/repository-assistant-service:0.1.6-arm64;
+```
 
-docker run -v ./conf:/home/dans/repository-assistant-service/conf -d -p 2810:2810 --name repository-assistant-service ekoindarto/repository-assistant-service:0.1.6-arm64;
-docker run -v ./conf:/home/dans/repository-assistant-service/conf -d -p 2810:2810 --name repository-assistant-service
+The Repository Assistant Service will be accessible at http://0.0.0.0:2810 and the API Docs will be accessible at http://0.0.0.0:2810/docs 
+or  http://0.0.0.0:2810/redoc
