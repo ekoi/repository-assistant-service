@@ -1,21 +1,22 @@
 [tool.poetry]
 name = "repository-assistant-service"
-version = "0.1.6"
+version = "0.1.8.1"
 description = ""
 authors = ["Eko Indarto <eko.indarto@dans.knaw.nl>"]
 readme = "README.md"
-include = ["resources/*", "logs/*", "conf/*"]
+include = ["resources/*", "logs/*"]
 packages = [
     { include = "src" }
 ]
 
 [tool.poetry.dependencies]
 python = "^3.12"
-uvicorn = "^0.24.post1"
+uvicorn = "^0.26.0"
 dynaconf = "^3.2.3"
-fastapi = "^0.105.0"
+fastapi = "^0.109.0"
 loguru = "^0.7.2"
 emoji = "^2.9.0"
+gunicorn = "^21.2.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -170,11 +170,7 @@ str_example_1 = '''{
 }
 '''
 
-# s = RepoAssistantModel(**json.loads(str_example_1))
-# print('xxx')
-# t = s.model_dump_json(by_alias=True, exclude_none=True)
-# print(type(t))
-# print(t)
+
 
 json_ohsmart = '''
 {
@@ -393,3 +389,12 @@ json_rda = '''
 }
 
 '''
+#
+# json_swh = '''
+# {"assistant-config-name": "faircore4eosc-swh_dev-dataverse_demo", "description": "", "app-name": "faircore4eosc", "app-config-url": "https://", "targets": [{"repo-name": "swh-staging-api", "repo-display-name": "Software Heritage - API", "bridge-module-class": "SwhApiDepositor", "base-url": "https://webapp.staging.swh.network", "target-url": "https://webapp.staging.swh.network/api/1/origin/save/git/url/", "username": "access_token", "password": "", "metadata": {"specification": [], "transformed-metadata": []}, "input": {}}, {"repo-name": "dataverse.eosc.dansdemo.nl", "repo-display-name": "Dataverse EOSC", "bridge-module-class": "DataverseIngester", "base-url": "https://dataverse.eosc.dansdemo.nl", "target-url": "https://dataverse.eosc.dansdemo.nl/api/dataverses/eosc/datasets", "username": "API_KEY", "password": "", "metadata": {"specification": ["https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv", "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"], "transformed-metadata": [{"name": "dataverse-dataset", "url": "https://transformer.labs.dans.knaw.nl/transform/faircore4eosc-form-metadata-to-dataverse-dataset-v1.xsl"}, {"name": "dataverse-file", "url": "https://transformer.labs.dans.knaw.nl/transform/faircore4eosc-form-metadata-to-dataverse-file-v1.xsl"}]}, "initial-release-version": "draft", "input": {"from": "swh-staging-api", "type": "JSON", "object-name": "metadata"}}, {"repo-name": "swh-staging-sword", "repo-display-name": "Software Heritage - SWORD2", "bridge-module-class": "SwhSwordDepositor", "base-url": "https://deposit.staging.swh.network", "target-url": "https://deposit.staging.swh.network/1/", "username": "access_token", "password": "", "metadata": {"specification": ["https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv", "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"], "transformed-metadata": [{"name": "form-metadata-sword", "url": "https://transformer.labs.dans.knaw.nl/transform/faircore4eosc-form-metadata-to-swd-sword-v1.xsl"}]}, "input": {"from": "dataverse.eosc.dansdemo.nl", "type": "JSON", "object-name": "metadata"}}], "file-conversion-url": [{"origin-type": "mov", "target-type": "mp4", "conversion-url": "https://"}, {"origin-type": "mp4", "target-type": "mp3", "conversion-url": "https://"}]}
+# '''
+# s = RepoAssistantDataModel(**json.loads(json_swh))
+# print('xxx')
+# t = s.model_dump_json(by_alias=True, exclude_none=True)
+# # print(type(t))
+# print(t)

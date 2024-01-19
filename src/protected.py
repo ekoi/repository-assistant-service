@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 from typing import Union
 
@@ -6,7 +7,7 @@ from fastapi import APIRouter, Request, HTTPException
 from pydantic_core import ValidationError
 from starlette.responses import FileResponse
 
-from src.commons import settings, data
+from src.commons import settings, data, installed_repos_configs, __version__
 from src.models.assistant_datamodel import RepoAssistantDataModel
 
 router = APIRouter()
@@ -22,13 +23,36 @@ async def get_log():
     return FileResponse(path=f"{os.environ['BASE_DIR']}/logs/rsas.log", filename="rsas.log", media_type='text/plain')
 
 
+@router.get("/refresh", include_in_schema=False)
+async def do_refresh():
+    logging.debug("do_refresh")
+    logging.debug(f'Before clear: {list(data.keys())}')
+    logging.debug("clear the data")
+    data.clear()
+    logging.debug(f'After clear: {list(data.keys())}')
+    installed_repos_configs()
+    logging.debug(f'Available repositories configurations: {sorted(list(data.keys()))}')
+    print("update version")
+    data.update({"service-version": f"{__version__}-refreshed"})
+    repos = [akm for akm in list(data.keys()) if akm != 'service-version']
+    logging.debug(data["service-version"])
+    logging.debug(f'After refresh: {list(data.keys())}')
+    return {"repositories": repos}
+
+
 @router.get('/{name}')
-def get_repositories_list(name: str):
-    print(f'name: {name}')
-    try:
-        return data[name].model_dump_json(by_alias=True, exclude_none=True)
-    except:
-        raise HTTPException(404, f"{name} not found")
+def get_name_from_repositories_list(name: str):
+    logging.debug(f'get_name_from_repositories_list - name: {name}')
+    logging.debug(f'{data.keys()}')
+    if name in data.keys():
+        logging.debug(f'{name} FOUND')
+        try:
+            return data[name].model_dump_json(by_alias=True, exclude_none=True)
+        except Exception as e:
+            logging.error(f'{name} does not {e}')
+    else:
+        logging.debug(f'{name} does not exist')
+    raise HTTPException(404, f"{name} not found")
 
 
 @router.post('/upload-repo', status_code=201)
@@ -47,7 +71,7 @@ async def upload_repository(submitted_repo_conf: Request, overwrite: Union[bool,
         else:
             data.update({repo_assistant.assistant_config_name: repo_assistant})
             with open(os.path.join(settings.repositories_conf_dir,
-                                   f'uploaded-{repo_assistant.assistant_config_name}.json'), mode="w+") as file:
+                                   f'{repo_assistant.assistant_config_name}.json'), mode="w+") as file:
                 file.write(json.dumps(repo_conf_json))
             return {"saved-conf": repo_assistant.assistant_config_name}
     except ValidationError as e:
