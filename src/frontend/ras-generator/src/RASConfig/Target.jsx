@@ -12,16 +12,28 @@ import {
 const Target = (props) => {
   const { fields, setFields, index, ...otherProps } = props
   const baseKey = "targets"
+  const bridgeModuleClassOptionalValues = [
+    "DansSwordDepositor",
+    "DataverseIngester",
+    "SwhApiDepositor",
+    "SwhSwordDepositor",
+    "ZenodoApiDepositor",
+    "FileSystem",
+    "Mail",
+    "PoC- B2Share",
+    "PoC-iRODS",
+    "PoC-PPRINT",
+  ]
   const [currFields, setCurrFields] = useState({
     "repo-name": "ssh.datastations.nl",
     "repo-display-name": "SSH Datastation",
     "bridge-module-class": "DansSwordDepositor",
     "base-url": "https://ssh.datastations.nl",
     "target-url": "https://sword2.ssh.datastations.nl/collection/1",
-    "username": "API_KEY",
-    "password": "",
-    "metadata": {
-      "specification": [],
+    username: "API_KEY",
+    password: "",
+    metadata: {
+      specification: [],
       "transformed-metadata": [],
     },
   })
@@ -92,17 +104,26 @@ const Target = (props) => {
           />
           <Form.Text className="text-muted"></Form.Text>
         </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
+        <Form.Group
+          className="mb-3"
+          controlId="formBasicEmail"
+          value={currFields["bridge-module-class"]}
+          onChange={(e) => {
+            onChangeFields(e, "bridge-module-class")
+          }}
+        >
           <Form.Label>bridge-module-class</Form.Label>
-          <Form.Control
-            type="text"
-            name="bridge-module-class"
-            value={currFields["bridge-module-class"]}
-            placeholder="..."
-            onChange={(e) => {
-              onChangeFields(e, "bridge-module-class")
-            }}
-          />
+          <Form.Select aria-label="Default select example">
+            <option value={""}>Open this select menu</option>
+            {bridgeModuleClassOptionalValues.map((v, i) => {
+              return (
+                <option value={v} key={i}>
+                  {v}
+                </option>
+              )
+            })}
+          </Form.Select>
+
           <Form.Text className="text-muted"></Form.Text>
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
@@ -159,9 +180,12 @@ const Target = (props) => {
         </Form.Group>
 
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>metadata  <Button size="sm" color="default" onClick={() => addMetadata()}>
-                Add Metadata
-              </Button></Form.Label>
+          <Form.Label>
+            metadata{" "}
+            <Button size="sm" color="default" onClick={() => addMetadata()}>
+              Add Metadata
+            </Button>
+          </Form.Label>
           <br></br>
           {currFields["metadata"]["transformed-metadata"]?.length > 0 && (
             <Table>
@@ -233,7 +257,6 @@ const Target = (props) => {
           {currFields["metadata"]["transformed-metadata"].length == 0 && (
             <>
               <Badge color="info">No Data</Badge>{" "}
-             
             </>
           )}
           <Form.Text className="text-muted"></Form.Text>
