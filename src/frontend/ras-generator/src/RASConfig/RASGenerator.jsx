@@ -15,9 +15,9 @@ import {
   Table,
 } from "react-bootstrap"
 import { Fragment } from "react/jsx-runtime"
-import Target from "./RASConfig/Target"
-import Enrichment from "./RASConfig/Enrichment"
-import FileConversion from "./RASConfig/FileConversion"
+import Target from "./Target"
+import Enrichment from "./Enrichment"
+import FileConversion from "./FileConversion"
 
 const RasGenerator = () => {
   const [fields, setFields] = useState({
@@ -29,15 +29,15 @@ const RasGenerator = () => {
     "file-conversions": [],
     "enrichments": [],
   })
-  const addSpesication = () => {}
-  const addTransformMetadata = () => {}
   const onAddTarget = () => {
     fields["targets"].push({})
     setFields({ ...fields })
   }
   
   const onAddEnrichment = () => {
-    fields["enrichments"].push({})
+    fields["enrichments"].push({
+      
+    })
     setFields({ ...fields })
   }
   const onAddFileConversion = () => {
@@ -80,6 +80,7 @@ const RasGenerator = () => {
                   <Form.Control
                     type="text"
                     name="assistant-config-name"
+                    value={fields["assistant-config-name"]||" "}
                     placeholder="..."
                     onChange={(e) => {
                       onChangeFields(e, "assistant-config-name")
@@ -92,6 +93,7 @@ const RasGenerator = () => {
                   <Form.Control
                     type="text"
                     name="description"
+                    value={fields["description"]||" "}
                     placeholder="..."
                     onChange={(e) => {
                       onChangeFields(e, "description")
@@ -104,6 +106,7 @@ const RasGenerator = () => {
                   <Form.Control
                     type="text"
                     name="app-name"
+                    value={fields["app-name"]||" "}
                     placeholder="..."
                     onChange={(e) => {
                       onChangeFields(e, "app-name")
@@ -116,6 +119,7 @@ const RasGenerator = () => {
                   <Form.Control
                     type="text"
                     name="app-config-url"
+                    value={fields["app-config-url"]||" "}
                     placeholder="..."
                     onChange={(e) => {
                       onChangeFields(e, "app-config-url")
@@ -192,7 +196,6 @@ const RasGenerator = () => {
             <CardFooter>
               <Button
                 style={{ float: "right" }}
-                as="a"
                 variant="primary"
                 onClick={downloadFile}
               >
@@ -202,7 +205,6 @@ const RasGenerator = () => {
           </Card>
         </Col>
       </Row>
-      {JSON.stringify(fields)}
     </Container>
   )
 }

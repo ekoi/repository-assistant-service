@@ -9,13 +9,12 @@ import {
   Table,
 } from "react-bootstrap"
 
-const FileConversion = (props) => {
+const EnrichmentNotification = (props) => {
   const { fields, setFields, index, ...otherProps } = props
-  const baseKey = "file-conversions"
+  const baseKey = "enrichments"
   const [currFields, setCurrFields] = useState({
-    "origin-type": "",
-    "target-type": "",
-    "conversion-url": "",
+    "type": "",
+    "conf": "",
   })
   const onChangeFields = (e, v) => {
     currFields[v] = e.target.value
@@ -32,49 +31,34 @@ const FileConversion = (props) => {
     setFields({ ...fields })
   }
   return (
-    <Card  {...otherProps}>
+    <Card {...otherProps}>
       <Card.Header>
-        File Conversion # {index}
+        Enrichment # {index}
         <ButtonGroup size="sm" style={{float:"right"}}>
           <Button color="danger" onClick={()=>onDelete(index)}>Delete</Button>
         </ButtonGroup>
       </Card.Header>
       <Card.Body>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>origin-type</Form.Label>
+          <Form.Label>name</Form.Label>
           <Form.Control
             type="text"
-            name="origin-type"
-            value={currFields["origin-type"] || ""}
+            name="name"
             placeholder="..."
             onChange={(e) => {
-              onChangeFields(e, "origin-type")
+              onChangeFields(e, "name")
             }}
           />
           <Form.Text className="text-muted"></Form.Text>
         </Form.Group>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>target-type</Form.Label>
+          <Form.Label>service-url</Form.Label>
           <Form.Control
             type="text"
-            name="target-type"
-            value={currFields["target-type"] || ""}
+            name="service-url"
             placeholder="..."
             onChange={(e) => {
-              onChangeFields(e, "target-type")
-            }}
-          />
-          <Form.Text className="text-muted"></Form.Text>
-        </Form.Group>
-        <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>conversion-url</Form.Label>
-          <Form.Control
-            type="text"
-            name="conversion-url"
-            value={currFields["conversion-url"] || ""}
-            placeholder="..."
-            onChange={(e) => {
-              onChangeFields(e, "conversion-url")
+              onChangeFields(e, "service-url")
             }}
           />
           <Form.Text className="text-muted"></Form.Text>
@@ -83,4 +67,4 @@ const FileConversion = (props) => {
     </Card>
   )
 }
-export default FileConversion
+export default EnrichmentNotification
