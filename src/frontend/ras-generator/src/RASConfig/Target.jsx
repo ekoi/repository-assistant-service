@@ -32,10 +32,6 @@ const Target = (props) => {
     currFields["notification"].push({})
     setCurrFields({ ...currFields })
   }
-  const onSave = () => {
-    fields[baseKey][index] = currFields
-    setFields({ ...fields })
-  }
   return (
     <Card {...otherProps}>
       <Card.Header>
