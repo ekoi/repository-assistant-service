@@ -13,11 +13,24 @@ const Target = (props) => {
   const { fields, setFields, index, ...otherProps } = props
   const baseKey = "targets"
   const [currFields, setCurrFields] = useState({
-    "repo-name": "",
-    "service-url": "",
-    "result-url": "",
-    notification: [],
+    "repo-name": "ssh.datastations.nl",
+    "repo-display-name": "SSH Datastation",
+    "bridge-module-class": "DansSwordDepositor",
+    "base-url": "https://ssh.datastations.nl",
+    "target-url": "https://sword2.ssh.datastations.nl/collection/1",
+    "username": "API_KEY",
+    "password": "",
+    "metadata": {
+        "specification":[],
+        "transformed-metadata":[]
+    },
   })
+  const addMetadata = ()=>{
+    currFields["metadata"]["transform-metadata"].push({})
+    setCurrFields({ ...currFields })
+    fields[baseKey][index] = currFields
+    setFields({ ...fields })
+  }
   const onChangeFields = (e, v) => {
     currFields[v] = e.target.value
     setCurrFields({ ...currFields })
@@ -35,7 +48,7 @@ const Target = (props) => {
   return (
     <Card {...otherProps}>
       <Card.Header>
-        Target # {index}
+        Target # {index} 
         <ButtonGroup size="sm" style={{float:"right"}}>
           <Button color="danger" onClick={()=>onDelete(index)}>Delete</Button>
         </ButtonGroup>
@@ -127,9 +140,9 @@ const Target = (props) => {
         </Form.Group>    
 
         <Form.Group className="mb-3" controlId="formBasicEmail">
-          <Form.Label>notications</Form.Label>
+          <Form.Label>metadata</Form.Label>
           <br></br>
-          {currFields?.notification?.length > 0 && (
+          {currFields["metadata"]["transformed-metadata"]?.length > 0 && (
             <Table>
               <thead>
                 <tr>
@@ -138,7 +151,7 @@ const Target = (props) => {
                 </tr>
               </thead>
               <tbody>
-                {currFields?.notification?.map((v, i) => {
+                {currFields?.metadata?.map((v, i) => {
                   ;<tr>
                     <td>{v.type}</td>
                     <td>{v.conf}</td>
@@ -147,11 +160,11 @@ const Target = (props) => {
               </tbody>
             </Table>
           )}
-          {currFields?.notification?.length == 0 && (
+          {currFields["metadata"]["transformed-metadata"].length == 0 && (
             <>
               <Badge color="info">No Data</Badge>{" "}
-              <Button size="sm" color="default" onClick={() => addNotification}>
-                Add Notification
+              <Button size="sm" color="default" onClick={() => addMetadata}>
+                Add Metadata
               </Button>
             </>
           )}

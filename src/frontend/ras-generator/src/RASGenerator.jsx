@@ -25,7 +25,7 @@ const RasGenerator = () => {
     "description": "",
     "app-name": "",
     "app-config-url": "",
-    "targets": [],
+    "targets": [{}],
     "file-conversions": [],
     "enrichments": [],
   })
