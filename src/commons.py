@@ -7,7 +7,7 @@ from dynaconf import Dynaconf
 
 from src.models.assistant_datamodel import RepoAssistantDataModel
 
-settings = Dynaconf(settings_files=["conf/settings.toml", "conf/.secrets.toml"],
+settings = Dynaconf(settings_files=["conf/settings.toml", "conf/*.yaml", "conf/.secrets.toml"],
                     environments=True)
 logging.basicConfig(filename=settings.LOG_FILE, level=settings.LOG_LEVEL,
                     format=settings.LOG_FORMAT)

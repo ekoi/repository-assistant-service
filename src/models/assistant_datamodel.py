@@ -18,7 +18,7 @@ class TransformedMetadata(BaseModel):
     """
     name: str
     transformer_url: Optional[str] = Field(None, alias='transformer-url')
-    target_dir: str = Field(None, alias='target-dir')
+    target_dir: Optional[str] = Field(None, alias='target-dir')
     restricted: Optional[bool] = None
 
 
@@ -34,20 +34,28 @@ class Metadata(BaseModel):
     transformed_metadata: List[TransformedMetadata] = Field(..., alias='transformed-metadata')
 
 
+class Input(BaseModel):
+    from_target_name: str = Field(default=None, alias='from-target-name')
+
+
 class Target(BaseModel):
     """
     Represents a target in the repository assistant application.
 
     Attributes:
-    - repo_name (str): The name of the repository.
-    - repo_display_name (str): The display name of the repository.
-    - bridge_module_class (str): The class name of the bridge module.
-    - base_url (str): The base URL of the repository.
-    - target_url (str): The target URL of the repository.
-    - username (str): The username for authentication.
-    - password (str): The password for authentication.
-    - metadata (Metadata): Metadata associated with the target repository.
+        repo_pid (str): A unique identifier for the repository. This field is required.
+        repo_name (str): The name of the repository. This field is required.
+        repo_display_name (str): The display name of the repository. This field is required.
+        bridge_module_class (str): The class name of the bridge module. This field is required.
+        base_url (str): The base URL of the repository. This field is required.
+        target_url (str): The target URL of the repository. This field is required.
+        username (str): The username for authentication. This field is required.
+        password (str): The password for authentication. This field is required.
+        metadata (Metadata): Metadata associated with the target repository. This field is required.
+        initial_release_version (Optional[str]): The initial release version of the repository. This field is optional.
+        input (Optional[Input]): Input data for the target. This field is optional.
     """
+    repo_pid: str = Field(..., alias='repo-pid')
     repo_name: str = Field(..., alias='repo-name')
     repo_display_name: str = Field(..., alias='repo-display-name')
     bridge_module_class: str = Field(..., alias='bridge-module-class')
@@ -56,6 +64,8 @@ class Target(BaseModel):
     username: str
     password: str
     metadata: Metadata
+    initial_release_version: Optional[str] = Field(default=None, alias='initial-release-version')
+    input: Optional[Input] = None
 
 
 class FileConversion(BaseModel):
@@ -92,256 +102,6 @@ class RepoAssistantDataModel(BaseModel):
     file_conversions: Optional[List[FileConversion]] = Field(None, alias='file-conversions')
 
 
-str_example_1 = '''{
-    "assistant-config-name": "new-local.ssh.datastations.nl",
-    "description": "",
-    "app-name": "ohsmart",
-    "app-config-url": "https://",
-    "targets": [
-        {
-            "repo-name": "demo.ssh.datastations.nl",
-            "repo-display-name": "SSH Datastation",
-            "bridge-module-class": "DansSwordDepositor",
-            "base-url": "https://demo.ssh.datastations.nl",
-            "target-url": "https://demo.sword2.ssh.datastations.nl/collection/1",
-            "username": "PLACE_HOLDER",
-            "password": "PLACE_HOLDER",
-            "metadata": {
-                "specification": [
-                    "https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
-                    "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"
-                ],
-                "transformed-metadata": [
-                    {
-                        "name": "dataset.xml",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-dataset-xml-v5.xsl",
-                        "target-dir": "metadata"
-                    },
-                    {
-                        "name": "files.xml",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-files-xml-v1.xsl",
-                        "target-dir": "metadata"
-                    },
-                    {
-                        "name": "__generated__form-metadata-original.json",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-clean-all.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-all-v1.xsl",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-private.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-private-v1.xsl",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-private.txt",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-private-v1.xsl",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-public.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-public-v1.xsl",
-                        "restricted": false
-                    },
-                    {
-                        "name": "__generated__form-metadata-public.txt",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-public-v1.xsl",
-                        "restricted": false
-                    }
-                ]
-            }
-        }
-    ],
-    "file-conversions": [
-        {
-            "origin-type": "mov",
-            "target-type": "mp4",
-            "conversion-url": "https://"
-        },
-        {
-            "origin-type": "mp4",
-            "target-type": "mp3",
-            "conversion-url": "https://"
-        }
-    ]
-}
-'''
-
-
-
-json_ohsmart = '''
-{
-    "assistant-config-name": "new-local.ssh.datastations.nl",
-    "description": "",
-    "app-name": "ohsmart",
-    "app-config-url": "https://",
-    "targets": [
-        {
-            "repo-name": "demo.ssh.datastations.nl",
-            "repo-display-name": "SSH Datastation",
-            "bridge-module-class": "DansSwordDepositor",
-            "base-url": "https://demo.ssh.datastations.nl",
-            "target-url": "https://demo.sword2.ssh.datastations.nl/collection/1",
-            "username": "PLACE_HOLDER",
-            "password": "PLACE_HOLDER",
-            "metadata": {
-                "specification": [
-                    "https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
-                    "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"
-                ],
-                "transformed-metadata": [
-                    {
-                        "name": "dataset.xml",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-dataset-xml-v5.xsl",
-                        "target-dir": "metadata"
-                    },
-                    {
-                        "name": "files.xml",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-files-xml-v1.xsl",
-                        "target-dir": "metadata"
-                    },
-                    {
-                        "name": "__generated__form-metadata-original.json",
-                        "mimetype": "application/json",
-                        "target-dir": "",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-clean-all.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-all-v1.xsl",
-                        "target-dir": "",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-private.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-private-v1.xsl",
-                        "target-dir": "",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-private.txt",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-private-v1.xsl",
-                        "target-dir": "",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-public.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-public-v1.xsl",
-                        "target-dir": "",
-                        "restricted": false
-                    },
-                    {
-                        "name": "__generated__form-metadata-public.txt",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-public-v1.xsl",
-                        "target-dir": "",
-                        "restricted": false
-                    }
-                ]
-            }
-        }
-    ],
-    "file-conversions": [
-        {
-            "origin-type": "mov",
-            "target-type": "mp4",
-            "conversion-url": "https://"
-        },
-        {
-            "origin-type": "mp4",
-            "target-type": "mp3",
-            "conversion-url": "https://"
-        }
-    ]
-}
-'''
-json_data_ohsmart = '''{
-    "assistant-config-name": "new-local.ssh.datastations.nl",
-    "description": "",
-    "app-name": "ohsmart",
-    "app-config-url": "https://",
-    "targets": [
-        {
-            "repo-name": "demo.ssh.datastations.nl",
-            "repo-display-name": "SSH Datastation",
-            "bridge-module-class": "DansSwordDepositor",
-            "base-url": "https://demo.ssh.datastations.nl",
-            "target-url": "https://demo.sword2.ssh.datastations.nl/collection/1",
-            "username": "PLACE_HOLDER",
-            "password": "PLACE_HOLDER",
-            "metadata": {
-                "specification": [
-                    "https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
-                    "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"
-                ],
-                "transformed-metadata": [
-                    {
-                        "name": "dataset.xml",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-dataset-xml-v5.xsl",
-                        "target-dir": "metadata"
-                    },
-                    {
-                        "name": "files.xml",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-files-xml-v1.xsl",
-                        "target-dir": "metadata"
-                    },
-                    {
-                        "name": "__generated__form-metadata-original.json",
-                        "mimetype": "application/json",
-                        "target-dir": ".",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-clean-all.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-all-v1.xsl",
-                        "target-dir": ".",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-private.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-private-v1.xsl",
-                        "target-dir": ".",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-private.txt",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-private-v1.xsl",
-                        "target-dir": ".",
-                        "restricted": true
-                    },
-                    {
-                        "name": "__generated__form-metadata-public.json",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-public-v1.xsl",
-                        "target-dir": ".",
-                        "restricted": false
-                    },
-                    {
-                        "name": "__generated__form-metadata-public.txt",
-                        "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-public-v1.xsl",
-                        "target-dir": ".",
-                        "restricted": false
-                    }
-                ]
-            }
-        }
-    ],
-    "file-conversions": [
-        {
-            "origin-type": "mov",
-            "target-type": "mp4",
-            "conversion-url": "https://"
-        },
-        {
-            "origin-type": "mp4",
-            "target-type": "mp3",
-            "conversion-url": "https://"
-        }
-    ]
-}
-# '''
-
 json_rda = '''
 {
     "assistant-config-name": "new-local.zenodo.org",
@@ -350,6 +110,7 @@ json_rda = '''
     "app-config-url": "https://",
     "targets": [
         {
+            "repo-pid":"PLACE_HOLDER",
             "repo-name": "demo.zenodo.org",
             "repo-display-name": "Zenodo Dev Environment",
             "bridge-module-class": "ZenodoApiDepositor",
@@ -389,11 +150,8 @@ json_rda = '''
 }
 
 '''
-#
-# json_swh = '''
-# {"assistant-config-name": "faircore4eosc-swh_dev-dataverse_demo", "description": "", "app-name": "faircore4eosc", "app-config-url": "https://", "targets": [{"repo-name": "swh-staging-api", "repo-display-name": "Software Heritage - API", "bridge-module-class": "SwhApiDepositor", "base-url": "https://webapp.staging.swh.network", "target-url": "https://webapp.staging.swh.network/api/1/origin/save/git/url/", "username": "access_token", "password": "", "metadata": {"specification": [], "transformed-metadata": []}, "input": {}}, {"repo-name": "dataverse.eosc.dansdemo.nl", "repo-display-name": "Dataverse EOSC", "bridge-module-class": "DataverseIngester", "base-url": "https://dataverse.eosc.dansdemo.nl", "target-url": "https://dataverse.eosc.dansdemo.nl/api/dataverses/eosc/datasets", "username": "API_KEY", "password": "", "metadata": {"specification": ["https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv", "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"], "transformed-metadata": [{"name": "dataverse-dataset", "url": "https://transformer.labs.dans.knaw.nl/transform/faircore4eosc-form-metadata-to-dataverse-dataset-v1.xsl"}, {"name": "dataverse-file", "url": "https://transformer.labs.dans.knaw.nl/transform/faircore4eosc-form-metadata-to-dataverse-file-v1.xsl"}]}, "initial-release-version": "draft", "input": {"from": "swh-staging-api", "type": "JSON", "object-name": "metadata"}}, {"repo-name": "swh-staging-sword", "repo-display-name": "Software Heritage - SWORD2", "bridge-module-class": "SwhSwordDepositor", "base-url": "https://deposit.staging.swh.network", "target-url": "https://deposit.staging.swh.network/1/", "username": "access_token", "password": "", "metadata": {"specification": ["https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv", "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"], "transformed-metadata": [{"name": "form-metadata-sword", "url": "https://transformer.labs.dans.knaw.nl/transform/faircore4eosc-form-metadata-to-swd-sword-v1.xsl"}]}, "input": {"from": "dataverse.eosc.dansdemo.nl", "type": "JSON", "object-name": "metadata"}}], "file-conversion-url": [{"origin-type": "mov", "target-type": "mp4", "conversion-url": "https://"}, {"origin-type": "mp4", "target-type": "mp3", "conversion-url": "https://"}]}
-# '''
-# s = RepoAssistantDataModel(**json.loads(json_swh))
+
+# s = RepoAssistantDataModel(**json.loads(json_rda))
 # print('xxx')
 # t = s.model_dump_json(by_alias=True, exclude_none=True)
 # # print(type(t))

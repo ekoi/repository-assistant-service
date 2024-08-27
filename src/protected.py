@@ -3,18 +3,24 @@ import logging
 import os
 from typing import Union
 
+import jmespath
+import requests
 from fastapi import APIRouter, Request, HTTPException
 from pydantic_core import ValidationError
 from starlette.responses import FileResponse
 
+from json_logic import jsonLogic
+
 from src.commons import settings, data, installed_repos_configs, __version__
 from src.models.assistant_datamodel import RepoAssistantDataModel
+from src.models.request_advice_model import RepositoryAdviceModel
 
 router = APIRouter()
 
 
 @router.get("/settings", include_in_schema=False)
 async def get_settings():
+    data.update({"service-version": __version__})
     return settings
 
 
@@ -53,6 +59,100 @@ def get_name_from_repositories_list(name: str):
     else:
         logging.debug(f'{name} does not exist')
     raise HTTPException(404, f"{name} not found")
+
+
+@router.post('/seek-advice', status_code=200)
+async def get_repo_advices(submitted_repo_data: Request):
+    content_type = submitted_repo_data.headers['Content-Type']
+    if content_type != 'application/json':
+        raise HTTPException(status_code=400, detail=f'Content type {content_type} not supported')
+
+    repo_conf_json = await submitted_repo_data.json()
+    try:
+        repo_advice = RepositoryAdviceModel.model_validate(repo_conf_json)
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=f'Repository Configuration {e.with_traceback(e.__traceback__)}')
+
+    logging.debug(f"repo_advice: {repo_advice.model_dump_json(by_alias=True)}")
+    transformer_headers = {
+        'Content-Type': 'application/json',
+        'Authorization': f'Bearer {settings.DANS_TRANSFORMER_SERVICE_API_KEY}'
+    }
+    narcis_domain_req = requests.post(settings.transformer_url, headers=transformer_headers,
+                                      data=repo_advice.model_dump_json())
+    if narcis_domain_req.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve the domain")
+
+    transformed_metadata = narcis_domain_req.json()
+    domain = transformed_metadata.get('result', None)
+    file_type = repo_advice.file_type
+    # Check whether the file type is in the list of datq keys
+    if file_type and file_type not in data.get("file-types"):
+        raise HTTPException(status_code=400, detail=f"The given file type '{file_type}'not found")
+
+    # Read the JSON file
+    if file_type:
+        with open(settings.REPO_FILE_TYPES, mode='r', encoding='utf-8') as json_file:
+            file_types_list = json.load(json_file)
+            # Use jmespath to search for the label corresponding to the given value
+            file_type_label = jmespath.search(f"[?value=='{file_type}'].label | [0]", file_types_list)
+        if not file_type_label:
+            raise HTTPException(status_code=400, detail=f"The given file type '{file_type}' not found")
+
+    institution_name_req = requests.get(f'https://api.ror.org/organizations{repo_advice.affiliation.path}')
+    if institution_name_req.status_code != 200:
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve the institution name")
+
+    institution_name = institution_name_req.json().get('name', None)
+    rule = {"and": []}
+
+    logging.debug(f"transformed_metadata: {institution_name}")
+
+    if institution_name in settings.INSTITUTION_LIST:
+        institution_condition = {"==": [{"var": "Institution"}, institution_name]}
+    else:
+        institution_condition = {"==": [{"var": "Institution"}, "Any"]}
+    rule['and'].append(institution_condition)
+
+    logging.debug(f"file_type: {file_type}")
+    if file_type:
+        file_type_condition = {"==": [{"var": "File Type"}, file_type_label]}
+    else:
+        file_type_condition = {"==": [{"var": "File Type"}, "Any"]}
+
+    logging.debug(f"domain: {domain}")
+    rule['and'].append(file_type_condition)
+    if domain in settings.DOMAIN_LIST:
+        domain_condition = {"==": [{"var": "Domain"}, domain]}
+    else:
+        domain_condition = {"==": [{"var": "Domain"}, "Any"]}
+    rule['and'].append(domain_condition)
+
+    logging.debug(f"rule: {rule}")
+
+    with open(settings.repo_available_list, mode='r', encoding='utf-8') as json_file:
+        repo_available_list = json.load(json_file)
+
+    results = [item["Repository/ Pipeline"] for item in repo_available_list if jsonLogic(rule, item)]
+
+    logging.debug(f"results: {results}")
+    advice = []
+    directory_path = settings.REPOSITORIES_SCHEMA_DIR
+    # List all files in the directory and filter by extension
+    filtered_files = [file for file in os.listdir(directory_path) if file.endswith(".json")]
+    for file in filtered_files:
+        with open(os.path.join(directory_path, file), 'r') as f:
+            advice_schema = json.load(f)
+            if advice_schema.get("Dataverse.NL"):
+                advice_schema = advice_schema["Dataverse.NL"]
+                advice.append(advice_schema)
+            else:
+                if results:
+                    a = advice_schema.get(results[0], None)
+                    if a:
+                        advice.append(a)
+
+    return {"advice": advice}
 
 
 @router.post('/upload-repo', status_code=201)

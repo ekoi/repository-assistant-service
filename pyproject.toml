@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "repository-assistant-service"
-version = "0.1.8.1"
+version = "0.2.8"
 description = ""
 authors = ["Eko Indarto <eko.indarto@dans.knaw.nl>"]
 readme = "README.md"
@@ -14,10 +14,12 @@ python = "^3.12"
 uvicorn = "^0.26.0"
 dynaconf = "^3.2.3"
 fastapi = "^0.109.0"
-loguru = "^0.7.2"
 emoji = "^2.9.0"
 gunicorn = "^21.2.0"
-
+python-keycloak = "^4.2.2"
+rule-engine = "^4.5.0"
+jmespath = "^1.0.1"
+json-logic = {git = "https://github.com/nadirizr/json-logic-py.git"}
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

@@ -1,6 +1,6 @@
 FROM python:3.12.1-bookworm
 
-ARG VERSION=0.1.8.1
+ARG VERSION=0.2.8
 
 RUN useradd -ms /bin/bash dans
 
@@ -14,7 +14,8 @@ COPY ./dist/*.* .
 #
 RUN mkdir -p ${BASE_DIR}  && \
     pip install --no-cache-dir *.whl && rm -rf *.whl && \
-    tar xf repository_assistant_service-${VERSION}.tar.gz -C ${BASE_DIR} --strip-components 1
+    tar xf repository_assistant_service-${VERSION}.tar.gz -C ${BASE_DIR} --strip-components 1 && \
+    rm -rf ${BASE_DIR}/conf/* && rm -f repository_assistant_service-${VERSION}.tar.gz
 
 WORKDIR ${BASE_DIR}
 
