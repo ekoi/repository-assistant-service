@@ -25,38 +25,36 @@ from src.commons import data, settings, installed_repos_configs, __version__
 api_keys = [settings.DANS_REPO_ASSISTANT_SERVICE_API_KEY]
 security = HTTPBearer()
 
-# Authorization Form: It doesn't matter what you type in the form, it won't work yet. But we'll get there.
-# See: https://fastapi.tiangolo.com/tutorial/security/first-steps/
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")  # use token authentication
-
 
 def auth_header(request: Request, auth_cred: Annotated[HTTPAuthorizationCredentials, Depends(security)]):
     """
     Simplified authentication header dependency function.
     """
-    api_key = auth_cred.credentials
-    if api_key not in api_keys:
+
+    if not auth_cred or auth_cred.credentials not in api_keys:
         keycloak_env = settings.get(f"keycloak_{request.headers.get('auth-env-name', 'local')}")
         if not keycloak_env:
+            logging.error(f"keycloak_env: {keycloak_env}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden")
 
         keycloak_openid = KeycloakOpenID(server_url=keycloak_env.URL, client_id=keycloak_env.CLIENT_ID,
                                          realm_name=keycloak_env.REALMS)
         try:
-            keycloak_openid.userinfo(api_key)
-            print(f"Keycloak: {keycloak_openid}")
+            keycloak_openid.userinfo(auth_cred.credentials)
+            logging.info(f"Keycloak: {keycloak_openid}")
         except KeycloakAuthenticationError:
+            logging.error(f"KeycloakAuthenticationError: {keycloak_openid}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden")
         except Exception as e:
-            print(f"Error: {e}")
+            logging.inf(f"Error: {e}")
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    print('start up')
+    logging.info('start up')
     installed_repos_configs()
-    print(f'Available repositories configurations: {sorted(list(data.keys()))}')
+    logging.info(f'Available repositories configurations: {sorted(list(data.keys()))}')
     data.update({"service-version": __version__})
-    print(emoji.emojize(':thumbs_up:'))
+    logging.info(emoji.emojize(':thumbs_up:'))
     # Load JSON data from the file
     with open(settings.repo_file_types) as file:
         file_types = json.load(file)

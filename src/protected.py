@@ -38,7 +38,6 @@ async def do_refresh():
     logging.debug(f'After clear: {list(data.keys())}')
     installed_repos_configs()
     logging.debug(f'Available repositories configurations: {sorted(list(data.keys()))}')
-    print("update version")
     data.update({"service-version": f"{__version__}-refreshed"})
     repos = [akm for akm in list(data.keys()) if akm != 'service-version']
     logging.debug(data["service-version"])

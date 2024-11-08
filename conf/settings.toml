@@ -15,7 +15,7 @@ log_format = "%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s"
 
 dans_formats_url = "https://raw.githubusercontent.com/ekoi/DANS-File-Formats/draft/dans-file-formats.json"
 
-transformer_url = "https://transformer.labs.dansdemo.nl/transform/4tu-narcis-mapping.xsl"
+transformer_url = "http://localhost:1745/transform/4tu-narcis-mapping.xsl"
 
 repo_file_types = "@format {env[BASE_DIR]}/conf/file-types.json"
 repo_available_list = "@format {env[BASE_DIR]}/conf/K.24.2.json"

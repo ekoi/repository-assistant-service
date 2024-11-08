@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "repository-assistant-service"
-version = "0.2.8"
+version = "0.2.11"
 description = ""
 authors = ["Eko Indarto <eko.indarto@dans.knaw.nl>"]
 readme = "README.md"
@@ -11,9 +11,9 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.12"
-uvicorn = "^0.26.0"
+uvicorn = "^0.32.0"
 dynaconf = "^3.2.3"
-fastapi = "^0.109.0"
+fastapi = "^0.115.4"
 emoji = "^2.9.0"
 gunicorn = "^21.2.0"
 python-keycloak = "^4.2.2"

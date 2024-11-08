@@ -30,7 +30,7 @@ class Metadata(BaseModel):
     - specification (List[str]): A list of specifications associated with the repository.
     - transformed_metadata (List[TransformedMetadata]): A list of transformed metadata instances.
     """
-    specification: List[str]
+    specification: Optional[List[str]] = None
     transformed_metadata: List[TransformedMetadata] = Field(..., alias='transformed-metadata')
 
 
@@ -61,46 +61,83 @@ class Target(BaseModel):
     bridge_module_class: str = Field(..., alias='bridge-module-class')
     base_url: str = Field(..., alias='base-url')
     target_url: str = Field(..., alias='target-url')
-    username: str
-    password: str
-    metadata: Metadata
+    target_url_params: Optional[str] = Field(default=None, alias='target-url-params')
+    username: Optional[str] = None
+    password: Optional[str] = None
+    metadata: Optional[Metadata] = None
     initial_release_version: Optional[str] = Field(default=None, alias='initial-release-version')
     input: Optional[Input] = None
+
+class NotificationItem(BaseModel):
+    """
+    Represents a notification item.
+
+    Attributes:
+    - type (str): The type of notification.
+    - conf (str): The configuration for the notification.
+    """
+    type: str
+    conf: str
 
 
 class FileConversion(BaseModel):
     """
-    Represents a file conversion configuration.
+    Represents a file conversion process.
 
     Attributes:
-    - origin_type (str): The type of the original file.
-    - target_type (str): The type of the target file after conversion.
-    - conversion_url (str): The URL for the file conversion.
+    - id (str): The unique identifier for the file conversion.
+    - origin_type (str): The original file type. This field is aliased to 'origin-type'.
+    - target_type (str): The target file type. This field is aliased to 'target-type'.
+    - conversion_url (str): The URL for the conversion service. This field is aliased to 'conversion-url'.
+    - notification (Optional[List[NotificationItem]]): A list of notification items associated with the conversion.
     """
+    id: str
     origin_type: str = Field(..., alias='origin-type')
     target_type: str = Field(..., alias='target-type')
     conversion_url: str = Field(..., alias='conversion-url')
+    notification: Optional[List[NotificationItem]] = None
+
+
+class Enrichment(BaseModel):
+    """
+    Represents an enrichment process.
+
+    Attributes:
+    - id (str): The unique identifier for the enrichment.
+    - name (str): The name of the enrichment.
+    - service_url (str): The URL for the enrichment service. This field is aliased to 'service-url'.
+    - result_url (str): The URL where the result of the enrichment can be found. This field is aliased to 'result-url'.
+    - notification (Optional[List[NotificationItem]]): A list of notification items associated with the enrichment.
+    - permission (Optional[str]): The permission level for the enrichment.
+    """
+    id: str
+    name: str
+    service_url: str = Field(..., alias='service-url')
+    result_url: str = Field(..., alias='result-url')
+    notification: Optional[List[NotificationItem]] = None
+    permission: Optional[str] = None
 
 
 class RepoAssistantDataModel(BaseModel):
     """
-    Represents the configuration model for the repository assistant application.
+    Represents the data model for the repository assistant.
 
     Attributes:
-    - assistant_config_name (str): The name of the assistant configuration.
-    - description (str): A description of the assistant configuration.
-    - app_name (str): The name of the application.
-    - app_config_url (str): The URL for the application configuration.
-    - targets (List[Target]): A list of target configurations.
-    - file_conversions (Optional[List[FileConversion]]): A list of file conversion configurations, if applicable.
+    - assistant_config_name (str): The name of the assistant configuration. This field is aliased to 'assistant-config-name'.
+    - description (str): A description of the repository assistant.
+    - app_name (str): The name of the application. This field is aliased to 'app-name'.
+    - app_config_url (str): The URL for the application configuration. This field is aliased to 'app-config-url'.
+    - targets (List[Target]): A list of target repositories.
+    - file_conversions (Optional[List[FileConversion]]): A list of file conversion processes. This field is aliased to 'file-conversions'.
+    - enrichments (Optional[List[Enrichment]]): A list of enrichment processes.
     """
     assistant_config_name: str = Field(..., alias='assistant-config-name')
-    description: str
+    description: Optional[str] = None
     app_name: str = Field(..., alias='app-name')
-    app_config_url: str = Field(..., alias='app-config-url')
+    app_config_url: Optional[str] = Field(None, alias='app-config-url')
     targets: List[Target]
     file_conversions: Optional[List[FileConversion]] = Field(None, alias='file-conversions')
-
+    enrichments: Optional[List[Enrichment]] = None
 
 json_rda = '''
 {
@@ -137,22 +174,51 @@ json_rda = '''
     ],
     "file-conversions": [
         {
+            "id": "1",
             "origin-type": "mov",
             "target-type": "mp4",
-            "conversion-url": "https://"
+            "conversion-url": "https://",
+            "notification": [
+                {
+                    "type": "mail",
+                    "conf": "file:///path"
+                }
+            ]
         },
         {
+            "id": "2",
             "origin-type": "mp4",
             "target-type": "mp3",
             "conversion-url": "https://"
+        }
+    ],
+    "enrichments": [
+        {
+            "id": "1",
+            "name": "CV",
+            "service-url": "https://cv-service.labs.dansdemo.nl",
+            "result-url": "file:///path"
+        },
+        {
+            "id": "2",
+            "name": "AVG-ML",
+            "service-url": "https://avg-service.labs.dansdemo.nl",
+            "result-url": "file:///path",
+            "notification": [
+                {
+                    "type": "mail",
+                    "conf": "file:///path"
+                }
+            ]
+        },
+        {
+            "id": "3",
+            "name": "TRANSCRIPT",
+            "permission":"PUBLIC",
+            "service-url": "https://whispers.surf.nl",
+            "result-url": "https:/doi.org/doi-numbers"
         }
     ]
 }
 
 '''
-
-# s = RepoAssistantDataModel(**json.loads(json_rda))
-# print('xxx')
-# t = s.model_dump_json(by_alias=True, exclude_none=True)
-# # print(type(t))
-# print(t)
