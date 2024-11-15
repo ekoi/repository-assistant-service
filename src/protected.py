@@ -11,7 +11,7 @@ from starlette.responses import FileResponse
 
 from json_logic import jsonLogic
 
-from src.commons import settings, data, installed_repos_configs, __version__
+from src.commons import settings, data, installed_repos_configs, get_version
 from src.models.assistant_datamodel import RepoAssistantDataModel
 from src.models.request_advice_model import RepositoryAdviceModel
 
@@ -20,7 +20,7 @@ router = APIRouter()
 
 @router.get("/settings", include_in_schema=False)
 async def get_settings():
-    data.update({"service-version": __version__})
+    data.update({"service-version": get_version()})
     return settings
 
 
@@ -38,7 +38,7 @@ async def do_refresh():
     logging.debug(f'After clear: {list(data.keys())}')
     installed_repos_configs()
     logging.debug(f'Available repositories configurations: {sorted(list(data.keys()))}')
-    data.update({"service-version": f"{__version__}-refreshed"})
+    data.update({"service-version": f"{get_version()}-refreshed"})
     repos = [akm for akm in list(data.keys()) if akm != 'service-version']
     logging.debug(data["service-version"])
     logging.debug(f'After refresh: {list(data.keys())}')

@@ -20,6 +20,7 @@ python-keycloak = "^4.2.2"
 rule-engine = "^4.5.0"
 jmespath = "^1.0.1"
 json-logic = {git = "https://github.com/nadirizr/json-logic-py.git"}
+tomli = "^2.1.0"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

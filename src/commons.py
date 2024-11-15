@@ -3,6 +3,7 @@ import json
 import logging
 import os
 
+import tomli
 from dynaconf import Dynaconf
 
 from src.models.assistant_datamodel import RepoAssistantDataModel
@@ -25,4 +26,12 @@ def installed_repos_configs():
                 data.update({repo_assistant.assistant_config_name: repo_assistant})
 
 
-__version__ = importlib.metadata.metadata(settings.SERVICE_NAME)["version"]
+def get_version():
+    with open(os.path.join(os.getenv("BASE_DIR"), 'pyproject.toml'), 'rb') as file:
+        package_details = tomli.load(file)
+    return package_details['tool']['poetry']['version']
+
+def get_name():
+    with open(os.path.join(os.getenv("BASE_DIR"), 'pyproject.toml'), 'rb') as file:
+        package_details = tomli.load(file)
+    return package_details['tool']['poetry']['name']

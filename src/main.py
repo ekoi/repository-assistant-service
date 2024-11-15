@@ -20,7 +20,7 @@ import json
 import jmespath
 
 from src import protected, public
-from src.commons import data, settings, installed_repos_configs, __version__
+from src.commons import data, settings, installed_repos_configs, get_version
 
 api_keys = [settings.DANS_REPO_ASSISTANT_SERVICE_API_KEY]
 security = HTTPBearer()
@@ -46,14 +46,14 @@ def auth_header(request: Request, auth_cred: Annotated[HTTPAuthorizationCredenti
             logging.error(f"KeycloakAuthenticationError: {keycloak_openid}")
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Forbidden")
         except Exception as e:
-            logging.inf(f"Error: {e}")
+            logging.info(f"Error: {e}")
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
     logging.info('start up')
     installed_repos_configs()
     logging.info(f'Available repositories configurations: {sorted(list(data.keys()))}')
-    data.update({"service-version": __version__})
+    data.update({"service-version": get_version()})
     logging.info(emoji.emojize(':thumbs_up:'))
     # Load JSON data from the file
     with open(settings.repo_file_types) as file:
@@ -66,7 +66,7 @@ async def lifespan(application: FastAPI):
 
 
 app = FastAPI(title=settings.FASTAPI_TITLE, description=settings.FASTAPI_DESCRIPTION,
-              version=__version__, lifespan=lifespan)
+              version=get_version(), lifespan=lifespan)
 
 app.include_router(
     public.router,
