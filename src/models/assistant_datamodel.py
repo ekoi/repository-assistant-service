@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 from typing import List, Optional
 
 from pydantic import BaseModel, Field
@@ -59,7 +58,7 @@ class Target(BaseModel):
     repo_name: str = Field(..., alias='repo-name')
     repo_display_name: str = Field(..., alias='repo-display-name')
     bridge_module_class: str = Field(..., alias='bridge-module-class')
-    base_url: str = Field(..., alias='base-url')
+    base_url: Optional[str] = Field(default=None, alias='base-url')
     target_url: str = Field(..., alias='target-url')
     target_url_params: Optional[str] = Field(default=None, alias='target-url-params')
     username: Optional[str] = None
