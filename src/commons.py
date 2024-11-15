@@ -21,7 +21,11 @@ def installed_repos_configs():
     for repo_conf_filename in os.listdir(settings.repositories_conf_dir):
         if repo_conf_filename.endswith('.json'):
             with open(os.path.join(settings.repositories_conf_dir, repo_conf_filename)) as f:
-                saved_repo_assistant = json.loads(f.read())
+                try:
+                    saved_repo_assistant = json.loads(f.read())
+                except json.JSONDecodeError as e:
+                    logging.error(f"Error loading {repo_conf_filename}: {e}")
+                    continue
                 repo_assistant = RepoAssistantDataModel.model_validate(saved_repo_assistant)
                 data.update({repo_assistant.assistant_config_name: repo_assistant})
 
