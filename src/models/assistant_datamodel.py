@@ -1,8 +1,9 @@
 from __future__ import annotations
 
+import urllib
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 
 class TransformedMetadata(BaseModel):
@@ -67,6 +68,14 @@ class Target(BaseModel):
     storage_type: Optional[str] = Field(default=None, alias='store-type')
     initial_release_version: Optional[str] = Field(default=None, alias='initial-release-version')
     input: Optional[Input] = None
+
+    @field_validator('target_url', 'base_url', mode='before')
+    def validate_urls(cls, v, field):
+        if v:
+            parsed_url = urllib.parse.urlparse(v)
+            if field.field_name in ['target_url', 'base_url'] and parsed_url.scheme not in ['https', 'http', 'file']:
+                raise ValueError(f"Invalid {field.name} URL: {v}")
+        return v
 
 class NotificationItem(BaseModel):
     """
