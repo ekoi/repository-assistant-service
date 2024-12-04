@@ -6,7 +6,7 @@ The Repository Assistant Service is a FastAPI-based application designed to mana
 
 ### Example use case: [Software Heritage (SWH) and Dataverse](https://swh.dansdemo.nl/)
 - **Flow diagram**:  ![SWH Flow diagram](./resources/images/swh.png)
-- **Configuration**: ![faircore4eosc-swh_dev-swh_demo.json](./resources/images/F4C.png)
+- **Configuration**: ![faircore4eosc-swh_dev-swh_demo.json](./resources/images/f4C.png)
 
 ### Table of Contents
 1. [Prerequisites](#prerequisites)
