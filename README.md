@@ -2,7 +2,12 @@
 
 ## Overview
 
-This documentation provides an overview and explanation of the Python code implementing a FastAPI service. The service includes endpoints for both public and protected routes, with the latter requiring API key authentication. The service initializes by loading repository configurations from JSON files during startup.
+The Repository Assistant Service is a FastAPI-based application designed to manage and interact with various repository configurations. It provides endpoints for uploading, deleting, and retrieving repository configurations, as well as offering advice based on the repository metadata.
+
+### Example use case: [Software Heritage (SWH) and Dataverse](https://swh.dansdemo.nl/)
+- **Flow diagram**:  ![SWH Flow diagram](./resources/images/swh.png)(./resources/images/swh.png)
+- **Configuration**: ![faircore4eosc-swh_dev-swh_demo.json](./resources/images/F4C.png)
+(https://github.com/ekoi/repository-assistant-service/blob/main/resources/saved-repos-conf/faircore4eosc-swh_dev-dataverse_demo.json)
 
 ### Table of Contents
 1. [Prerequisites](#prerequisites)
