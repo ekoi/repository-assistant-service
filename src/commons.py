@@ -26,11 +26,15 @@ def installed_repos_configs():
                     saved_repo_assistant = json.loads(f.read())
                     repo_assistant = RepoAssistantDataModel.model_validate(saved_repo_assistant)
                     data.update({repo_assistant.assistant_config_name: repo_assistant})
+                    logging.info(f"Loaded valid: {repo_assistant.assistant_config_name} in {repo_conf_filename}")
+                    print(f"Loaded valid: {repo_assistant.assistant_config_name} in {repo_conf_filename}")
                 except json.JSONDecodeError as e:
                     logging.error(f"Error loading {repo_conf_filename}: {e}")
+                    print(f">>> Error: {repo_assistant.assistant_config_name} in {repo_conf_filename}, caused by {e}")
                     continue
                 except ValidationError as e:
                     logging.error(f"Error validating: {e}")
+                    print(f">>> Error: {repo_assistant.assistant_config_name} in {repo_conf_filename}, caused by {e}")
                     continue
                 
 

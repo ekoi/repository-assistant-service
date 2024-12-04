@@ -5,6 +5,7 @@
     "app-config-url": "https://",
     "targets": [
         {
+            "repo-pid": "ssh.datastations.nl",
             "repo-name": "demo.ssh.datastations.nl",
             "repo-display-name": "SSH Datastation",
             "bridge-module-class": "DansSwordDepositor",

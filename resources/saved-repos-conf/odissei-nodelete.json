@@ -1,0 +1,48 @@
+{
+    "assistant-config-name": "odissei-no-delete",
+    "description": "",
+    "app-name": "odissei",
+    "app-config-url": "https://",
+    "targets": [
+        {
+	    "repo-pid": "001",
+        "repo-name": "oai-pmh",
+        "repo-display-name": "oai-pmh",
+        "bridge-module-class": "OaiHarvesterClientGetRecord",
+        "target-url": "https://data.individualdevelopment.nl/oai",
+        "target-url-params": "metadataPrefix=oai_datacite",
+        "metadata": {
+                "transformed-metadata": [
+                    {
+                        "name": "dataverse-dataset",
+                        "transformer-url": "http://localhost:1745/transform/cid-oaipmh-to-dv-v1-poc.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            }
+     
+        },
+        {   
+	    "repo-pid":"002",
+            "repo-name": "dataverse.eosc.dansdemo.nl",
+            "repo-display-name": "Dataverse EOSC",
+            "bridge-module-class": "DataverseIngester",
+            "target-url": "https://portal.devstack.odissei.nl/api/dataverses/poc/datasets/:import",
+            "target-url-params": "pid=$PID&release=no",
+            "username": "API_KEY",
+            "password": ""
+        }
+    ],
+    "file-conversion-url": [
+        {
+            "origin-type": "mov",
+            "target-type": "mp4",
+            "conversion-url": "https://"
+        },
+        {
+            "origin-type": "mp4",
+            "target-type": "mp3",
+            "conversion-url": "https://"
+        }
+    ]
+}

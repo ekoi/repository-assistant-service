@@ -1,0 +1,59 @@
+{
+    "assistant-config-name": "odissei",
+    "description": "",
+    "app-name": "odissei",
+    "app-config-url": "https://",
+    "targets": [
+        {
+	    "repo-pid": "001",
+        "repo-name": "oai-pmh",
+        "repo-display-name": "oai-pmh",
+        "target-url": "https://oai-service.labs.dansdemo.nl/ss/oai",
+        "target-url-params": "metadataPrefix=oai_ddi",
+        "metadata": {
+                "transformed-metadata": [
+                    {
+                        "name": "dataverse-dataset",
+                        "transformer-url": "http://localhost:1745/transform/oai-pmh-record-to-dataverse-metadata.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            }
+     
+        },
+        {   
+	    "repo-pid":"002",
+            "repo-name": "dataverse.eosc.dansdemo.nl",
+            "repo-display-name": "Dataverse EOSC",
+            "bridge-module-class": "DataverseIngester",
+            "base-url": "https://dataverse.eosc.dansdemo.nl",
+            "target-url": "https://dataverse.eosc.dansdemo.nl/api/dataverses/eosc/datasets/:import",
+            "target-url-params": "pid=$PID&release=no",
+            "username": "API_KEY",
+            "password": ""
+        },
+        {   
+	    "repo-pid":"003",
+            "repo-name": "dataverse.eosc.dansdemo.nl-delete",
+            "repo-display-name": "Dataverse EOSC-delete",
+            "bridge-module-class": "DataverseDatasetDelete",
+            "base-url": "https://dataverse.eosc.dansdemo.nl",
+            "target-url": "https://dataverse.eosc.dansdemo.nl/api/datasets/:persistentId",
+            "target-url-params": "persistentId=$PID",
+            "username": "API_KEY",
+            "password": ""
+        }
+    ],
+    "file-conversion-url": [
+        {
+            "origin-type": "mov",
+            "target-type": "mp4",
+            "conversion-url": "https://"
+        },
+        {
+            "origin-type": "mp4",
+            "target-type": "mp3",
+            "conversion-url": "https://"
+        }
+    ]
+}

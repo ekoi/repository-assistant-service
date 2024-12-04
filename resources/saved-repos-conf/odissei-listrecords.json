@@ -1,0 +1,44 @@
+{
+    "assistant-config-name": "odissei-list",
+    "description": "",
+    "app-name": "odissei-list",
+    "targets": [
+        {
+	    "repo-pid": "001",
+        "repo-name": "oai-pmh-identifiers",
+        "repo-display-name": "oai-pmh",
+        "bridge-module-class": "OaiHarvesterClientListIdentiers",
+        "base-url": "https://oai-service.labs.dansdemo.nl/",
+        "target-url": "https://oai-service.labs.dansdemo.nl/ss/oai",
+        "target-url-params": "metadataPrefix=oai_ddi",
+        "metadata": {
+                "transformed-metadata": [
+                    {
+                        "name": "dataverse-dataset",
+                        "transformer-url": "http://localhost:1745/transform/oai-pmh-list-identifiers-to-metada.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            }
+     
+        },
+        {
+	    "repo-pid": "002",
+        "repo-name": "ps",
+        "repo-display-name": "ps",
+        "bridge-module-class": "PSFlowExecutor",
+        "base-url": "http://localhost:10124",
+        "target-url": "http://localhost:10124/inbox/dataset",
+        "metadata": {
+                "transformed-metadata": [
+                    {
+                        "name": "dataverse-dataset",
+                        "transformer-url": "http://localhost:1745/transform/oai-pmh-list-identifiers-to-metada.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            }
+     
+        }
+    ]
+}

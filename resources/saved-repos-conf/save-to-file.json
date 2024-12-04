@@ -1,0 +1,39 @@
+{
+    "assistant-config-name": "safe-to-file",
+    "description": "",
+    "app-name": "PoC",
+    "app-config-url": "https://",
+    "targets": [
+        {
+	    "repo-pid": "001",
+        "repo-name": "oai-pmh",
+        "repo-display-name": "oai-pmh",
+        "bridge-module-class": "OaiHarvesterClientGetRecord",
+        "base-url": "https://oai-service.labs.dansdemo.nl/",
+        "target-url": "https://oai-service.labs.dansdemo.nl/ss/oai",
+        "target-url-params": "metadataPrefix=oai_ddi",
+        "metadata": {
+                "transformed-metadata": [
+                    {
+                        "name": "dataverse-dataset",
+                        "transformer-url": "http://localhost:1745/transform/oai-pmh-record-to-dataverse-metadata.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            }
+     
+        }
+    ],
+    "file-conversion-url": [
+        {
+            "origin-type": "mov",
+            "target-type": "mp4",
+            "conversion-url": "https://"
+        },
+        {
+            "origin-type": "mp4",
+            "target-type": "mp3",
+            "conversion-url": "https://"
+        }
+    ]
+}

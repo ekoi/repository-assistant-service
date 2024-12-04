@@ -1,0 +1,24 @@
+{
+    "assistant-config-name": "ps",
+    "app-name": "ps",
+    "targets": [
+        {
+	    "repo-pid": "1",
+        "repo-name": "ps",
+        "repo-display-name": "ps",
+        "bridge-module-class": "PSFlowExecutor",
+        "base-url": "http://localhost:10124",
+        "target-url": "http://localhost:10124/inbox/dataset",
+        "metadata": {
+                "transformed-metadata": [
+                    {
+                        "name": "dataverse-dataset",
+                        "transformer-url": "http://localhost:1745/transform/oai-pmh-list-identifiers-to-metada.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            }
+     
+        }
+    ]
+}

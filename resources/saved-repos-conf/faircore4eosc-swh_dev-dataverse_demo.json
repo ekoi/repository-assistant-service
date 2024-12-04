@@ -1,0 +1,92 @@
+{
+    "assistant-config-name": "faircore4eosc-swh_dev-dataverse_demo",
+    "description": "",
+    "app-name": "faircore4eosc",
+    "app-config-url": "https://",
+    "targets": [
+        {
+	    "repo-pid": "001",
+            "repo-name": "swh-staging-api",
+            "repo-display-name": "Software Heritage - API",
+            "bridge-module-class": "SwhApiDepositor",
+            "base-url": "https://webapp.staging.swh.network",
+            "target-url": "https://webapp.staging.swh.network/api/1/origin/save/git/url",
+            "username": "access_token",
+            "password": "",
+            "metadata": {
+                "specification": [],
+                "transformed-metadata": []
+            },
+            "input": {}
+        },
+        {   
+	    "repo-pid":"002",
+            "repo-name": "dataverse.eosc.dansdemo.nl",
+            "repo-display-name": "Dataverse EOSC",
+            "bridge-module-class": "DataverseIngester",
+            "base-url": "https://dataverse.eosc.dansdemo.nl",
+            "target-url": "https://dataverse.eosc.dansdemo.nl/api/dataverses/eosc/datasets",
+            "username": "API_KEY",
+            "password": "",
+            "metadata": {
+                "specification": [
+                    "https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
+                    "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"
+                ],
+                "transformed-metadata": [
+                    {
+                        "name": "dataset-metadata.json",
+                        "transformer-url": "http://localhost:1745/transform/faircore4eosc-form-metadata-to-dataverse-dataset-v1.xsl",
+                        "target-dir": "metadata"
+                    },
+                    {
+                        "name": "dataset-files.json",
+                        "transformer-url": "http://localhost:1745/transform/faircore4eosc-form-metadata-to-dataverse-file-v1.xsl",
+                        "target-dir": "metadata"
+                    }
+                ]
+            },
+            "initial-release-version": "draft",
+            "input": {
+                "from-target-name": "swh-staging-api"
+            }
+        },
+        {
+	    "repo-pid":"003",
+            "repo-name": "swh-staging-sword",
+            "repo-display-name": "Software Heritage - SWORD2",
+            "bridge-module-class": "SwhSwordDepositor",
+            "base-url": "https://deposit.staging.swh.network",
+            "target-url": "https://deposit.staging.swh.network/1/dans/",
+            "username": "access_token",
+            "password": "",
+            "metadata": {
+                "specification": [
+                    "https://raw1.githubusercontent.com/IQSS/dataverse/master/scripts/api/data/metadatablocks/citation.tsv",
+                    "https://github.com/DANS-KNAW/dd-dtap/blob/master/provisioning/files/custom-metadata-blocks/archaeology_specific_metadata.tsv"
+                ],
+                "transformed-metadata": [
+                    {
+                        "name": "form-metadata-sword",
+                        "transformer-url": "http://localhost:1745/transform/faircore4eosc-form-metadata-to-swd-sword-v1.xsl"
+                    }
+                ]
+            },
+            "input": {
+                "from-target-name": "dataverse.eosc.dansdemo.nl"
+            }
+        }
+    ],
+    "file-conversion-url": [
+        {
+            "origin-type": "mov",
+            "target-type": "mp4",
+            "conversion-url": "https://"
+        },
+        {
+            "origin-type": "mp4",
+            "target-type": "mp3",
+            "conversion-url": "https://"
+        }
+    ]
+}
