@@ -1,5 +1,5 @@
 {
-    "assistant-config-name": "odissei",
+    "assistant-config-name": "odissei-poc",
     "description": "",
     "app-name": "odissei",
     "app-config-url": "https://",
@@ -8,6 +8,7 @@
 	    "repo-pid": "001",
         "repo-name": "oai-pmh",
         "repo-display-name": "oai-pmh",
+        "bridge-module-class": "OaiHarvesterClientGetRecord",
         "target-url": "https://oai-service.labs.dansdemo.nl/ss/oai",
         "target-url-params": "metadataPrefix=oai_ddi",
         "metadata": {
@@ -19,7 +20,7 @@
                     }
                 ]
             }
-     
+
         },
         {   
 	    "repo-pid":"002",
