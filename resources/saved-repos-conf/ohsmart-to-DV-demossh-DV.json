@@ -8,7 +8,7 @@
             "repo-pid": "ssh.datastations.nl",
             "repo-name": "dataverse.local",
             "repo-display-name": "Dataverse Local",
-            "bridge-module-class": "DataverseIngester",
+            "bridge-plugin-name": "DataverseIngester",
             "base-url": "https://demo.ssh.datastations.nl",
             "target-url": "https://demo.ssh.datastations.nl/api/dataverses/root/datasets",
             "username": "API_KEY",
@@ -17,43 +17,43 @@
                 "specification": [],
                 "transformed-metadata": [
                     {
-                        "name": "dataset-metadata.json",
                         "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-DV-metadata-v4.xsl",
-                        "target-dir": "metadata"
+                        "name": "dataset-metadata.json",
+                        "dir": "metadata"
                     },
                     {
-                        "name": "dataset-files.json",
                         "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-DV-files-v2.xsl",
-                        "target-dir": "metadata"
+                        "name": "dataset-files.json",
+                        "dir": "metadata"
                     },
                     {
                         "name": "__generated__form-metadata-original.json",
                         "mimetype": "application/json",
-                        "target-dir": "",
+                        "dir": "",
                         "restricted": true
                     },
                     {
                         "name": "__generated__form-metadata-private.json",
                         "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-private-v2.xsl",
-                        "target-dir": "",
+                        "dir": "",
                         "restricted": true
                     },
                     {
                         "name": "Oral History metadata private.txt",
                         "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-private-v2.xsl",
-                        "target-dir": "",
+                        "dir": "",
                         "restricted": true
                     },
                     {
                         "name": "__generated__form-metadata-public.json",
                         "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-json-public-v2.xsl",
-                        "target-dir": "",
+                        "dir": "",
                         "restricted": false
                     },
                     {
-                        "name": "Oral History metadata public.txt",
                         "transformer-url": "http://localhost:1745/transform/ohsmart-form-metadata-to-text-public-v2.xsl",
-                        "target-dir": "",
+                        "name": "Oral History metadata public.txt",
+                        "dir": "",
                         "restricted": false
                     }
                 ]

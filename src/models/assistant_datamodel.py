@@ -12,15 +12,21 @@ class TransformedMetadata(BaseModel):
     Represents metadata for a transformed resource.
 
     Attributes:
-    - name (str): The name of the transformed resource.
     - transformer_url (Optional[str]): The URL of the transformer, if applicable.
-    - target_dir (str): The target directory for the transformed resource.
+    - name (str): The name of the transformed result.
+    - dir (str): The directory for the transformed result.
     - restricted (Optional[bool]): Indicates if the resource is restricted.
     """
-    name: str
     transformer_url: Optional[str] = Field(None, alias='transformer-url')
-    target_dir: Optional[str] = Field(None, alias='target-dir')
+    name: str
+    dir: Optional[str] = None
     restricted: Optional[bool] = None
+
+
+class ProcessedMetadata(BaseModel):
+    processed_function: Optional[str] = Field(None, alias='processed-function')
+    name: str
+    dir: Optional[str] = None
 
 
 class Metadata(BaseModel):
@@ -32,7 +38,8 @@ class Metadata(BaseModel):
     - transformed_metadata (List[TransformedMetadata]): A list of transformed metadata instances.
     """
     specification: Optional[List[str]] = None
-    transformed_metadata: List[TransformedMetadata] = Field(..., alias='transformed-metadata')
+    transformed_metadata: Optional[List[TransformedMetadata]] = Field(None, alias='transformed-metadata')
+    processed_metadata: Optional[List[ProcessedMetadata]] = Field(None, alias='processed-metadata')
 
 
 class Input(BaseModel):
@@ -65,7 +72,7 @@ class Target(BaseModel):
         repo_pid (str): A unique identifier for the repository. This field is required.
         repo_name (str): The name of the repository. This field is required.
         repo_display_name (str): The display name of the repository. This field is required.
-        bridge_module_class (str): The class name of the bridge module. This field is required.
+        bridge_plugin_name (str): The class name of the bridge plugin. This field is required.
         base_url (str): The base URL of the repository. This field is required.
         target_url (str): The target URL of the repository. This field is required.
         username (str): The username for authentication. This field is required.
@@ -77,7 +84,7 @@ class Target(BaseModel):
     repo_pid: str = Field(..., alias='repo-pid')
     repo_name: str = Field(..., alias='repo-name')
     repo_display_name: str = Field(..., alias='repo-display-name')
-    bridge_module_class: str = Field(..., alias='bridge-module-class')
+    bridge_plugin_name: str = Field(..., alias='bridge-plugin-name')
     base_url: Optional[str] = Field(default=None, alias='base-url')
     target_url: str = Field(..., alias='target-url')
     target_url_params: Optional[str] = Field(default=None, alias='target-url-params')
@@ -93,8 +100,15 @@ class Target(BaseModel):
         if v:
             parsed_url = urllib.parse.urlparse(v)
             if field.field_name in ['target_url', 'base_url'] and parsed_url.scheme not in ['https', 'http', 'file', 'mailto', 's3']:
-                raise ValueError(f"Invalid {field.name} URL: {v}")
+                raise ValueError(f"Invalid {field.output_name} URL: {v}")
         return v
+    #
+    # @field_validator('metadata', mode='before')
+    # def validate_metadata(cls, v):
+    #     print(v)
+    #     if v and not isinstance(v, Metadata):
+    #         raise ValueError("Invalid metadata")
+    #     return v
 
 class NotificationItem(BaseModel):
     """

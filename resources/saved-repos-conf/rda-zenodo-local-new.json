@@ -8,7 +8,7 @@
             "repo-pid": "https://doi.org/10.17616/R3QP53",
             "repo-name": "demo.zenodo.org",
             "repo-display-name": "Zenodo Dev Environment",
-            "bridge-module-class": "ZenodoApiDepositor",
+            "bridge-plugin-name": "ZenodoApiDepositor",
             "base-url": "https://zenodo.org",
             "target-url": "https://zenodo.org/api/deposit/depositions",
             "username": "access_token",
@@ -17,14 +17,14 @@
                 "specification": [],
                 "transformed-metadata": [
                     {
-                        "name": "zenodo-dataset.json",
                         "transformer-url": "http://localhost:1745/transform/rda-form-metadata-to-zenodo-dataset-v1.xsl",
-                        "target-dir": ""
+                        "name": "zenodo-dataset.json",
+                        "dir": ""
                     },
                     {
-                        "name": "zenodo-file.json",
                         "transformer-url": "http://localhost:1745/transform/form-metadata-to-dataverse-file-v1.xsl",
-                        "target-dir": ""
+                        "name": "zenodo-file.json",
+                        "dir": ""
                     }
                 ]
             }
