@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "repository-assistant-service"
-version = "0.2.11"
+version = "0.2.12"
 description = ""
 authors = ["Eko Indarto <eko.indarto@dans.knaw.nl>"]
 readme = "README.md"
@@ -10,17 +10,18 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.12"
-uvicorn = "^0.32.0"
+python = "^3.12" #Saxon-CHE is not compatible with Python 3.13!!!!
+uvicorn = "^0.34.0"
 dynaconf = "^3.2.3"
 fastapi = "^0.115.4"
 emoji = "^2.9.0"
-gunicorn = "^21.2.0"
+gunicorn = "^23.0.0"
 python-keycloak = "^4.2.2"
 rule-engine = "^4.5.0"
 jmespath = "^1.0.1"
 json-logic = {git = "https://github.com/nadirizr/json-logic-py.git"}
 tomli = "^2.1.0"
+saxonche = "^12.5.0" # DON'T UPDATE PYTHON 3.12. Saxon-CHE is not compatible with Python 3.13!!!!
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
