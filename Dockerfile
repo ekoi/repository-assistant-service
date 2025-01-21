@@ -1,33 +1,41 @@
-FROM node:20.11-bookworm-slim AS node-image
-FROM python:3.12.1-bookworm
+FROM python:3.12-bookworm
+LABEL authors="Eko Indarto"
 
-ARG VERSION=0.2.12
+# Combine apt-get commands to reduce layers
+RUN apt-get update -y && \
+    apt-get upgrade -y && \
+    apt-get dist-upgrade -y && \
+    apt-get install -y --no-install-recommends git curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN useradd -ms /bin/bash dans
 
-COPY --from=node-image /usr/local/bin/node /usr/local/bin/
-COPY --from=node-image /usr/local/lib/node_modules /usr/local/lib/node_modules
-RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
-    && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
+# Install Poetry using the official installation script
+RUN curl -sSL https://install.python-poetry.org | python3 -
 
-USER dans
-WORKDIR /home/dans
-ENV PYTHONPATH=/home/dans/repository-assistant-service/src
-ENV BASE_DIR=/home/dans/repository-assistant-service
+# Add Poetry to the PATH
+ENV PATH="/root/.local/bin:$PATH"
 
-COPY ./dist/*.* .
+RUN useradd -ms /bin/bash akmi
 
-#
-RUN mkdir -p ${BASE_DIR}  && \
-    pip install --no-cache-dir *.whl && rm -rf *.whl && \
-    tar xf repository_assistant_service-${VERSION}.tar.gz -C ${BASE_DIR} --strip-components 1 && \
-    rm -rf ${BASE_DIR}/conf/* && rm -f repository_assistant_service-${VERSION}.tar.gz
+ENV PYTHONPATH=/home/akmi/ras/src
+ENV BASE_DIR=/home/akmi/ras
 
 WORKDIR ${BASE_DIR}
 
-COPY start.sh .
-#RUN chmod +x start.sh
+COPY pyproject.toml .
+COPY README.md .
+COPY src ./src
 
-#CMD ["python", "src/main.py"]
+
+RUN  poetry install
+RUN  poetry build
+RUN  pip install --no-cache-dir dist/*.whl && rm -rf dist/*.whl
+
+RUN chown -R akmi:akmi ${BASE_DIR}
+
+
+USER akmi
+CMD ["python", "src/main.py"]
+
 #CMD ["tail", "-f", "/dev/null"]
-ENTRYPOINT ["/home/dans/repository-assistant-service/start.sh"]
