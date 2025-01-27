@@ -1,36 +1,34 @@
+import json
 import logging
 import os
 from contextlib import asynccontextmanager
-
-import multiprocessing
+from logging.handlers import RotatingFileHandler
 from typing import Annotated
 
-from gunicorn.app.wsgiapp import WSGIApplication
-from keycloak import KeycloakOpenID, KeycloakAuthenticationError
-
-
 import emoji
+import jmespath
 import uvicorn
 from fastapi import FastAPI, Request, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from keycloak import KeycloakOpenID, KeycloakAuthenticationError
 from starlette import status
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.cors import CORSMiddleware
 
-import json
-import jmespath
-
 from src import protected, public
-from src.commons import data, settings, installed_repos_configs, get_version
+from src.commons import data, settings, installed_repos_configs, project_details
 
 api_keys = [settings.DANS_REPO_ASSISTANT_SERVICE_API_KEY]
 security = HTTPBearer()
 
+from akmi_utils import otel, logging as akmi_logging
+
+APP_NAME = os.environ.get("APP_NAME", "ras")
+EXPOSE_PORT = os.environ.get("EXPOSE_PORT", 2810)
+OTLP_GRPC_ENDPOINT = os.environ.get("OTLP_GRPC_ENDPOINT", "http://localhost:4317")
 
 def auth_header(request: Request, auth_cred: Annotated[HTTPAuthorizationCredentials, Depends(security)]):
-    """
-    Simplified authentication header dependency function.
-    """
-
     if not auth_cred or auth_cred.credentials not in api_keys:
         keycloak_env = settings.get(f"keycloak_{request.headers.get('auth-env-name', 'local')}")
         if not keycloak_env:
@@ -53,20 +51,50 @@ async def lifespan(application: FastAPI):
     logging.info('start up')
     installed_repos_configs()
     logging.info(f'Available repositories configurations: {sorted(list(data.keys()))}')
-    data.update({"service-version": get_version()})
     logging.info(emoji.emojize(':thumbs_up:'))
-    # Load JSON data from the file
     with open(settings.repo_file_types) as file:
         file_types = json.load(file)
-    # Use jmespath to retrieve all "values"
     values = jmespath.search('[*].value', file_types)
     data.update({"file-types": values})
 
     yield
 
+app = FastAPI(title= project_details['title'], description = project_details['description'],
+              version= project_details['version'], lifespan=lifespan)
 
-app = FastAPI(title=settings.FASTAPI_TITLE, description=settings.FASTAPI_DESCRIPTION,
-              version=get_version(), lifespan=lifespan)
+LOG_FILE = settings.LOG_FILE
+
+app.add_middleware(otel.PrometheusMiddleware, app_name=APP_NAME)
+app.add_route("/metrics", otel.metrics)
+
+otel.setting_otlp(app, APP_NAME, OTLP_GRPC_ENDPOINT)
+
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_404_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        logging.error(f"404 Not Found: {request.url}")
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Endpoint not found"}
+        )
+    logging.error(f"HTTP Exception: {exc.status_code} - {exc.detail}")
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"message": exc.detail}
+    )
+
+@app.middleware("http")
+async def log_requests_middleware(request: Request, call_next):
+    return await akmi_logging.log_requests(request, call_next)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(
     public.router,
@@ -81,44 +109,23 @@ app.include_router(
     dependencies=[Depends(auth_header)]
 )
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
-
-class RepoAssistantServiceApplication(WSGIApplication):
-    def __init__(self, app_uri, options=None):
-        self.options = options or {}
-        self.app_uri = app_uri
-        super().__init__()
-
-    def load_config(self):
-        config = {
-            key: value
-            for key, value in self.options.items()
-            if key in self.cfg.settings and value is not None
-        }
-        for key, value in config.items():
-            self.cfg.set(key.lower(), value)
-
-
-def run():
-    options = {
-        "bind": "0.0.0.0:2810",
-        "workers": (multiprocessing.cpu_count() * 2) + 1,
-        "worker_class": "uvicorn.workers.UvicornWorker",
-    }
-    RepoAssistantServiceApplication("src.main:app", options).run()
-
+logging.getLogger("uvicorn.access").addFilter(otel.MetricsEndpointFilter())
+logging.getLogger("uvicorn.access").addFilter(otel.TraceContextFilter())
 
 if __name__ == "__main__":
-    logging.info("Start")
-    if os.environ.get('run-local'):
-        uvicorn.run("src.main:app", host="0.0.0.0", port=2810, reload=False)
+    log_config = uvicorn.config.LOGGING_CONFIG
+    log_config["formatters"]["access"]["fmt"] = (
+        "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [%(funcName)s] "
+        "[trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
+    )
 
-    else:
-        run()
+    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=10)
+    file_handler.setFormatter(logging.Formatter(log_config["formatters"]["access"]["fmt"]))
+    print(f'--------=======-------LOG_FILE: {LOG_FILE}')
+    logging.getLogger().addHandler(file_handler)
+    # Set the logging level for h11 to ERROR
+    logging.getLogger("h11").setLevel(logging.ERROR)
+    file_handler.setLevel(logging.INFO)
+
+    uvicorn.run(app, host="0.0.0.0", port=EXPOSE_PORT, log_config=log_config)

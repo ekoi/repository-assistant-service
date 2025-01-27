@@ -1,4 +1,4 @@
-FROM python:3.12-bookworm
+FROM python:3.12.8-bookworm
 LABEL authors="Eko Indarto"
 
 # Combine apt-get commands to reduce layers

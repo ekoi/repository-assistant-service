@@ -11,22 +11,12 @@ from starlette.responses import FileResponse
 
 from json_logic import jsonLogic
 
-from src.commons import settings, data, installed_repos_configs, get_version
-from src.models.assistant_datamodel import RepoAssistantDataModel
+from src.commons import settings, data, installed_repos_configs, project_details
+from akmi_utils.models import ras
+
 from src.models.request_advice_model import RepositoryAdviceModel
 
 router = APIRouter()
-
-
-@router.get("/settings", include_in_schema=False)
-async def get_settings():
-    data.update({"service-version": get_version()})
-    return settings
-
-
-@router.get('/logs', include_in_schema=False)
-async def get_log():
-    return FileResponse(path=f"{os.environ['BASE_DIR']}/logs/rsas.log", filename="rsas.log", media_type='text/plain')
 
 
 @router.get("/refresh", include_in_schema=False)
@@ -38,14 +28,13 @@ async def do_refresh():
     logging.debug(f'After clear: {list(data.keys())}')
     installed_repos_configs()
     logging.debug(f'Available repositories configurations: {sorted(list(data.keys()))}')
-    data.update({"service-version": f"{get_version()}-refreshed"})
-    repos = [akm for akm in list(data.keys()) if akm != 'service-version']
-    logging.debug(data["service-version"])
+    repos = [akm for akm in list(data.keys())]
+    logging.debug(project_details['version'])
     logging.debug(f'After refresh: {list(data.keys())}')
     return {"repositories": repos}
 
 
-@router.get('/{name}')
+@router.get('/name/{name}')
 def get_name_from_repositories_list(name: str):
     logging.debug(f'get_name_from_repositories_list - name: {name}')
     logging.debug(f'{data.keys()}')
@@ -162,7 +151,7 @@ async def upload_repository(submitted_repo_conf: Request, overwrite: Union[bool,
 
     repo_conf_json = await submitted_repo_conf.json()
     try:
-        repo_assistant = RepoAssistantDataModel.model_validate(repo_conf_json)
+        repo_assistant = ras.RepoAssistantDataModel.model_validate(repo_conf_json)
         if not overwrite and repo_assistant.assistant_config_name in data.keys():
             raise HTTPException(status_code=400, detail=f'Repository Configuration "'
                                                         f'{repo_assistant.assistant_config_name}" exist.'

@@ -1,20 +1,19 @@
-import importlib.metadata
 import json
 import logging
 import os
 
 import tomli
+from akmi_utils.models import ras
+from akmi_utils import commons as a_commons
 from dynaconf import Dynaconf
 from pydantic import ValidationError
 
-from src.models.assistant_datamodel import RepoAssistantDataModel
 
 settings = Dynaconf(settings_files=["conf/settings.toml", "conf/*.yaml", "conf/.secrets.toml"],
                     environments=True)
-logging.basicConfig(filename=settings.LOG_FILE, level=settings.LOG_LEVEL,
-                    format=settings.LOG_FORMAT)
 data = {}
 
+project_details = a_commons.get_project_details(os.getenv("BASE_DIR"), ['name', 'version', 'description', 'title'])
 
 def installed_repos_configs():
     logging.debug("startup")
@@ -25,7 +24,7 @@ def installed_repos_configs():
                 try:
                     print(f'repo_conf_filename: {repo_conf_filename}')
                     saved_repo_assistant = json.loads(f.read())
-                    repo_assistant = RepoAssistantDataModel.model_validate(saved_repo_assistant)
+                    repo_assistant = ras.RepoAssistantDataModel.model_validate(saved_repo_assistant)
                     if repo_assistant.assistant_config_name in data:
                         logging.warning(
                             f"Configuration {repo_assistant.assistant_config_name} already exists and will be overwritten.")
@@ -43,13 +42,3 @@ def installed_repos_configs():
                     continue
                 
 
-
-def get_version():
-    with open(os.path.join(os.getenv("BASE_DIR"), 'pyproject.toml'), 'rb') as file:
-        package_details = tomli.load(file)
-    return package_details['tool']['poetry']['version']
-
-def get_name():
-    with open(os.path.join(os.getenv("BASE_DIR"), 'pyproject.toml'), 'rb') as file:
-        package_details = tomli.load(file)
-    return package_details['tool']['poetry']['name']

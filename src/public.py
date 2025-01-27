@@ -1,8 +1,12 @@
 import logging
+import random
+import time
 
-from fastapi import APIRouter, HTTPException
+import httpx
+from fastapi import APIRouter, HTTPException, Response, Request
+from opentelemetry.propagate import inject
 
-from src.commons import data
+from src.commons import data, project_details
 
 router = APIRouter()
 
@@ -13,8 +17,8 @@ def get_repositories_list():
     return {"repositories": repos}
 
 
-@router.get('/')
+@router.get('/info')
 def info():
     logging.info("Repository Selection and Advice Service")
     logging.debug("info")
-    return {"name": "Repository Selection and Advice Service", "version": data["service-version"]}
+    return project_details
