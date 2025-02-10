@@ -24,7 +24,7 @@ security = HTTPBearer()
 
 from akmi_utils import otel, logging as akmi_logging
 
-APP_NAME = os.environ.get("APP_NAME", "ras")
+APP_NAME = os.environ.get("APP_NAME", "Repository Assistant Service")
 EXPOSE_PORT = os.environ.get("EXPOSE_PORT", 2810)
 OTLP_GRPC_ENDPOINT = os.environ.get("OTLP_GRPC_ENDPOINT", "http://localhost:4317")
 
@@ -69,6 +69,22 @@ app.add_route("/metrics", otel.metrics)
 
 otel.setting_otlp(app, APP_NAME, OTLP_GRPC_ENDPOINT)
 
+logging.getLogger("uvicorn.access").addFilter(otel.MetricsEndpointFilter())
+logging.getLogger("uvicorn.access").addFilter(otel.TraceContextFilter())
+
+log_config = uvicorn.config.LOGGING_CONFIG
+log_config["formatters"]["access"]["fmt"] = (
+    "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [%(funcName)s] "
+    "[trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
+)
+
+file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=10)
+file_handler.setFormatter(logging.Formatter(log_config["formatters"]["access"]["fmt"]))
+logging.getLogger().addHandler(file_handler)
+# Set the logging level for h11 to ERROR
+logging.getLogger("h11").setLevel(logging.ERROR)
+file_handler.setLevel(logging.INFO)
+
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_404_handler(request: Request, exc: StarletteHTTPException):
@@ -110,22 +126,9 @@ app.include_router(
 )
 
 
-logging.getLogger("uvicorn.access").addFilter(otel.MetricsEndpointFilter())
-logging.getLogger("uvicorn.access").addFilter(otel.TraceContextFilter())
+
 
 if __name__ == "__main__":
-    log_config = uvicorn.config.LOGGING_CONFIG
-    log_config["formatters"]["access"]["fmt"] = (
-        "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [%(funcName)s] "
-        "[trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
-    )
 
-    file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=10)
-    file_handler.setFormatter(logging.Formatter(log_config["formatters"]["access"]["fmt"]))
-    print(f'--------=======-------LOG_FILE: {LOG_FILE}')
-    logging.getLogger().addHandler(file_handler)
-    # Set the logging level for h11 to ERROR
-    logging.getLogger("h11").setLevel(logging.ERROR)
-    file_handler.setLevel(logging.INFO)
 
     uvicorn.run(app, host="0.0.0.0", port=EXPOSE_PORT, log_config=log_config)
