@@ -18,11 +18,10 @@ from starlette.middleware.cors import CORSMiddleware
 
 from src import protected, public
 from src.commons import data, settings, installed_repos_configs, project_details
+from akmi_utils import commons as a_commons
 
 api_keys = [settings.DANS_REPO_ASSISTANT_SERVICE_API_KEY]
 security = HTTPBearer()
-
-from akmi_utils import otel, logging as akmi_logging
 
 APP_NAME = os.environ.get("APP_NAME", "Repository Assistant Service")
 EXPOSE_PORT = os.environ.get("EXPOSE_PORT", 2810)
@@ -56,34 +55,19 @@ async def lifespan(application: FastAPI):
         file_types = json.load(file)
     values = jmespath.search('[*].value', file_types)
     data.update({"file-types": values})
-
     yield
 
 app = FastAPI(title= project_details['title'], description = project_details['description'],
               version= project_details['version'], lifespan=lifespan)
 
 LOG_FILE = settings.LOG_FILE
-
-app.add_middleware(otel.PrometheusMiddleware, app_name=APP_NAME)
-app.add_route("/metrics", otel.metrics)
-
-otel.setting_otlp(app, APP_NAME, OTLP_GRPC_ENDPOINT)
-
-logging.getLogger("uvicorn.access").addFilter(otel.MetricsEndpointFilter())
-logging.getLogger("uvicorn.access").addFilter(otel.TraceContextFilter())
-
 log_config = uvicorn.config.LOGGING_CONFIG
-log_config["formatters"]["access"]["fmt"] = (
-    "%(asctime)s %(levelname)s [%(name)s] [%(filename)s:%(lineno)d] [%(funcName)s] "
-    "[trace_id=%(otelTraceID)s span_id=%(otelSpanID)s resource.service.name=%(otelServiceName)s] - %(message)s"
-)
 
-file_handler = RotatingFileHandler(LOG_FILE, maxBytes=10 * 1024 * 1024, backupCount=10)
-file_handler.setFormatter(logging.Formatter(log_config["formatters"]["access"]["fmt"]))
-logging.getLogger().addHandler(file_handler)
-# Set the logging level for h11 to ERROR
-logging.getLogger("h11").setLevel(logging.ERROR)
-file_handler.setLevel(logging.INFO)
+if settings.otlp_enable is False:
+    logging.basicConfig(filename=settings.LOG_FILE, level=settings.LOG_LEVEL,
+                        format=settings.LOG_FORMAT)
+else:
+    a_commons.set_otlp(app, APP_NAME, OTLP_GRPC_ENDPOINT, LOG_FILE, log_config)
 
 
 @app.exception_handler(StarletteHTTPException)
@@ -100,9 +84,7 @@ async def custom_404_handler(request: Request, exc: StarletteHTTPException):
         content={"message": exc.detail}
     )
 
-@app.middleware("http")
-async def log_requests_middleware(request: Request, call_next):
-    return await akmi_logging.log_requests(request, call_next)
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -126,9 +108,6 @@ app.include_router(
 )
 
 
-
-
 if __name__ == "__main__":
-
-
+    logging.info("RAS: Starting the app __main__")
     uvicorn.run(app, host="0.0.0.0", port=EXPOSE_PORT, log_config=log_config)

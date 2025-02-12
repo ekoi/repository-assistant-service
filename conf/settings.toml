@@ -3,7 +3,11 @@
 repositories_conf_dir = "@format {env[BASE_DIR]}/resources/saved-repos-conf"
 repositories_schema_dir = "@format {env[BASE_DIR]}/resources/repo-schemas"
 
-log_file = "@format {env[BASE_DIR]}/logs/ras.log"
+otlp_enable = true
+log_file = "/Users/akmi/surfdrive/WORK-2025/INFRA/ACP-Monitor/apps/all-logs/ras.log"
+#log_file = "@format {env[BASE_DIR]}/logs/ras.log"
+log_level = 10
+log_format = "%(asctime)s %(levelname)s %(name)s %(threadName)s : %(message)s"
 
 dans_formats_url = "https://raw.githubusercontent.com/ekoi/DANS-File-Formats/draft/dans-file-formats.json"
 
