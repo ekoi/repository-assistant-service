@@ -1,32 +1,16 @@
 [project]
 name = "repository-assistant-service"
-version = "0.3.1"
+version = "0.3.3"
 description = "Recommend repository or repositories based on deposit attributes<br/>Recommend metadata schema and profile based on repository, format and domain"
 authors = [{name = "Eko Indarto", email = "eko.indarto@dans.knaw.nl"}]
 readme = "README.md"
 title = "Repository Selection and Advice Service"  #
-
-[tool.poetry.dependencies]
-python = "^3.12.8" #Saxon-CHE is not compatible with Python 3.13!!!!
-uvicorn = "^0.34.0"
-dynaconf = "^3.2.6"
-fastapi = "^0.115.6"
-emoji = "^2.9.0"
-python-keycloak = "^4.2.2"
-rule-engine = "^4.5.0"
-jmespath = "^1.0.1"
-json-logic = {git = "https://github.com/nadirizr/json-logic-py.git"}
-tomli = "^2.1.0"
-akmi-utils = "0.1.6.2"
-
-[poetry.group.dev.dependencies]
-pytest = "^8.3.4"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-packages = [
-    {include = "src"}
+requires-python = ">=3.12.8"
+dependencies = [
+    "akmi-utils>=0.1.5.2",
+    "dynaconf>=3.2.9",
+    "emoji>=2.14.1",
+    "jmespath>=1.0.1",
+    "json-logic>=0.6.3",
+    "python-keycloak>=4.2.2"
 ]

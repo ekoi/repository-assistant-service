@@ -22,6 +22,7 @@ The Repository Assistant Service is a FastAPI-based application designed to mana
 ## 1. Prerequisites <a name="prerequisites"></a>
 
 - **Python**: Ensure that Python is installed on the system. The code is designed to work with Python 3.12 and above.
+- **uv**: A Python package management tool that simplifies the process of managing dependencies and virtual environments. It ensures that all required packages are installed and up-to-date, making the development process smoother and more efficient. For more information, visit the [uv documentation](https://docs.astral.sh/uv/).
 
 ## 2. Dependencies <a name="dependencies"></a>
 
@@ -30,8 +31,6 @@ The following external libraries are required for the service:
 - **FastAPI**: A modern, fast web framework for building APIs with Python.
 - **Uvicorn**: An ASGI server for running FastAPI applications.
 - **Starlette**: The underlying ASGI framework for FastAPI.
-- **Emoji**: A library for adding emoji support to Python applications.
-- **Importlib-metadata**: A library for accessing the metadata for installed Python packages.
 
 These dependencies can be installed using the following command:
 ### 2. Dependencies <a name="dependencies"></a>
@@ -41,8 +40,6 @@ The main dependencies include:
 - **FastAPI**: A modern, fast web framework for building APIs.
 - **Uvicorn**: An ASGI server for running FastAPI applications.
 - **Starlette**: The ASGI framework supporting FastAPI.
-- **Emoji**: A library for adding emoji support.
-- **Importlib-metadata**: A library for accessing package metadata.
 
 ### 3. Configuration <a name="configuration"></a>
 
@@ -93,12 +90,8 @@ or  http://0.0.0.0:2810/redoc
 
 To start the service, run the following command:
 ```bash
-uvicorn src.main:app --host 0.0.0.0 --port 2810 --reload False
 
-```bash
-pip install fastapi uvicorn starlette emoji importlib-metadata
-
-
+uv run src/main.py
 
 ```
 

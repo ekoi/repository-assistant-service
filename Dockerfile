@@ -1,6 +1,7 @@
 FROM python:3.12.8-bookworm
 LABEL authors="Eko Indarto"
 
+
 # Combine apt-get commands to reduce layers
 RUN apt-get update -y && \
     apt-get upgrade -y && \
@@ -9,13 +10,6 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-
-# Install Poetry using the official installation script
-RUN curl -sSL https://install.python-poetry.org | python3 -
-
-# Add Poetry to the PATH
-ENV PATH="/root/.local/bin:$PATH"
-
 RUN useradd -ms /bin/bash akmi
 
 ENV PYTHONPATH=/home/akmi/ras/src
@@ -23,19 +17,28 @@ ENV BASE_DIR=/home/akmi/ras
 
 WORKDIR ${BASE_DIR}
 
+
+# Install uv.
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+# Copy the application into the container.
+
+
+# Create and activate virtual environment
+RUN python -m venv .venv
+ENV PATH="/home/akmi/ras/.venv/bin:$PATH"
+# Copy the application into the container.
+COPY src ./src
 COPY pyproject.toml .
 COPY README.md .
-COPY src ./src
+COPY uv.lock .
 
+RUN uv venv .venv
+# Install dependencies
 
-RUN  poetry install
-RUN  poetry build
-RUN  pip install --no-cache-dir dist/*.whl && rm -rf dist/*.whl
+RUN uv sync --frozen --no-cache
 
-RUN chown -R akmi:akmi ${BASE_DIR}
-
-
-USER akmi
-CMD ["python", "src/main.py"]
+# Run the application.
+CMD ["python", "-m", "src.main"]
 
 #CMD ["tail", "-f", "/dev/null"]
